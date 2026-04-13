@@ -33,25 +33,25 @@ ENV_CONF = {
     "overseas": {
         "ip_address": "sgdns.shanlipoc.com:10200,usdns.shanlipoc.com:10200",
         "context": "pocstar",
-        "upgrade_url": "upgrade.pocstar.com"
+        "upgrade_url": "upgrade.pocstar.com",
     },
     "domestic_v2": {
         "ip_address": "cndns.shanliptt.com:10200",
         "context": "show",
-        "upgrade_url": "upgrade.shanliptt.com"
+        "upgrade_url": "upgrade.shanliptt.com",
     },
 }
 
 # 2. 显示名称映射
 ENV_DISPLAY_NAMES = {
     "overseas": {"zh": "海外环境", "en": "Overseas Env"},
-    "domestic_v2": {"zh": "国内环境2.0", "en": "Domestic 2.0"}
+    "domestic_v2": {"zh": "国内环境2.0", "en": "Domestic 2.0"},
 }
 
 LOGIN_TYPE_MAPPING = {
     "account": {"zh": "账号登录", "en": "Account Login"},
     "serial": {"zh": "IMEI登录", "en": "IMEI Login"},
-    "iccid": {"zh": "ICCID登录", "en": "ICCID Login"}
+    "iccid": {"zh": "ICCID登录", "en": "ICCID Login"},
 }
 
 MAP_CONFIG_TEMPLATES = {
@@ -64,8 +64,8 @@ MAP_CONFIG_TEMPLATES = {
             "provider": "baidu",
             "coor": "bd09ll",
             "update_period_sec": 40,
-            "report_period_sec": 40
-        }
+            "report_period_sec": 40,
+        },
     },
     "baidu_oversea": {
         "display_name": {"zh": "百度 [海外]", "en": "Baidu [Oversea]"},
@@ -76,8 +76,8 @@ MAP_CONFIG_TEMPLATES = {
             "provider": "baidu",
             "coor": "wgs84",
             "update_period_sec": 40,
-            "report_period_sec": 40
-        }
+            "report_period_sec": 40,
+        },
     },
     "google": {
         "display_name": {"zh": "谷歌", "en": "Google"},
@@ -88,8 +88,8 @@ MAP_CONFIG_TEMPLATES = {
             "provider": "google",
             "coor": "wgs84",
             "update_period_sec": 40,
-            "report_period_sec": 40
-        }
+            "report_period_sec": 40,
+        },
     },
     "none": {
         "display_name": {"zh": "GPS", "en": "GPS"},
@@ -100,9 +100,9 @@ MAP_CONFIG_TEMPLATES = {
             "provider": "default",
             "coor": "wgs84",
             "update_period_sec": 40,
-            "report_period_sec": 40
-        }
-    }
+            "report_period_sec": 40,
+        },
+    },
 }
 
 # 关键文件路径
@@ -144,7 +144,7 @@ DEFAULT_CUSTOM_LIST = [
     "switch_group_name_tts",
     "switch_group_click",
     "join_prev_group",
-    "new_call_in"
+    "new_call_in",
 ]
 
 SKIP_FEEDBACK_INTERVAL = 5
@@ -156,6 +156,7 @@ ctk.set_default_color_theme("blue")
 
 
 # ==================== 环境检测工具函数 ====================
+
 
 def check_command(cmd: str) -> bool:
     """检查命令是否在系统 PATH 中"""
@@ -172,7 +173,9 @@ def is_adb_installed() -> bool:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             timeout=15,
-            creationflags=subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            ),
         )
         return result.returncode == 0
     except Exception:
@@ -189,7 +192,9 @@ def is_java_installed() -> bool:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             timeout=15,
-            creationflags=subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            ),
         )
         return result.returncode == 0
     except Exception:
@@ -200,12 +205,16 @@ def show_env_error_dialog(parent: ctk.CTk, missing_list: List[str]) -> None:
     """显示环境缺失的弹窗"""
     msg = "System environment check failed：\n\n"
     if "ADB" in missing_list:
-        msg += "❌ ADB (Android Debug Bridge)\n   " \
-               "Decompress and install ADB compressed package in Env\n" \
-               ", and set system variables.。\n"
+        msg += (
+            "❌ ADB (Android Debug Bridge)\n   "
+            "Decompress and install ADB compressed package in Env\n"
+            ", and set system variables.。\n"
+        )
     if "JAVA" in missing_list:
-        msg += "❌ Java (JDK/JRE)\n   " \
-               "Solution: extract the JDK compressed package in Env and install it.\n"
+        msg += (
+            "❌ Java (JDK/JRE)\n   "
+            "Solution: extract the JDK compressed package in Env and install it.\n"
+        )
     msg += "\nPlease install the missing components and click [Retry Detection].。"
 
     dialog = ctk.CTkToplevel(parent)
@@ -229,8 +238,12 @@ def show_env_error_dialog(parent: ctk.CTk, missing_list: List[str]) -> None:
         parent.quit()
         sys.exit(0)
 
-    ctk.CTkButton(btn_frame, text="重试检测", command=on_retry, fg_color="green").pack(side="left", padx=10)
-    ctk.CTkButton(btn_frame, text="退出程序", command=on_exit, fg_color="red").pack(side="left", padx=10)
+    ctk.CTkButton(btn_frame, text="重试检测", command=on_retry, fg_color="green").pack(
+        side="left", padx=10
+    )
+    ctk.CTkButton(btn_frame, text="退出程序", command=on_exit, fg_color="red").pack(
+        side="left", padx=10
+    )
 
 
 class EnvChecker:
@@ -248,12 +261,15 @@ class EnvChecker:
 
         if missing:
             if show_dialog:
-                self.parent.after(0, lambda: show_env_error_dialog(self.parent, missing))
+                self.parent.after(
+                    0, lambda: show_env_error_dialog(self.parent, missing)
+                )
             return False
         return True
 
 
 # ==================== 后端逻辑类 (ADB 监听) ====================
+
 
 class SmartKeyBackend:
     """ADB 监听与配置生成后端"""
@@ -275,8 +291,10 @@ class SmartKeyBackend:
         """加载本地 input.json 配置"""
         if not os.path.exists(JSON_FILE):
             self.data = {
-                "stdkey": {}, "action": {}, "intent": {},
-                "custom": DEFAULT_CUSTOM_LIST.copy()
+                "stdkey": {},
+                "action": {},
+                "intent": {},
+                "custom": DEFAULT_CUSTOM_LIST.copy(),
             }
             self.existing_actions = set()
             self.existing_codes = set()
@@ -287,11 +305,13 @@ class SmartKeyBackend:
                 self.data = json.load(f)
 
             self.existing_actions = {
-                info.get("action") for name, info in self.data.get("intent", {}).items()
+                info.get("action")
+                for name, info in self.data.get("intent", {}).items()
                 if info.get("action")
             }
             self.existing_codes = {
-                info.get("key") for name, info in self.data.get("stdkey", {}).items()
+                info.get("key")
+                for name, info in self.data.get("stdkey", {}).items()
                 if info.get("key") is not None
             }
 
@@ -305,8 +325,10 @@ class SmartKeyBackend:
         except Exception as e:
             self.log_callback(f"[Error] Failed to read configuration：{e}\n")
             self.data = {
-                "stdkey": {}, "action": {}, "intent": {},
-                "custom": DEFAULT_CUSTOM_LIST.copy()
+                "stdkey": {},
+                "action": {},
+                "intent": {},
+                "custom": DEFAULT_CUSTOM_LIST.copy(),
             }
             self.existing_actions = set()
             self.existing_codes = set()
@@ -334,7 +356,11 @@ class SmartKeyBackend:
                     ["taskkill", "/F", "/T", "/PID", str(self.process.pid)],
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
-                    creationflags=subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+                    creationflags=(
+                        subprocess.CREATE_NO_WINDOW
+                        if platform.system() == "Windows"
+                        else 0
+                    ),
                 )
             else:
                 self.process.terminate()
@@ -356,15 +382,21 @@ class SmartKeyBackend:
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 timeout=5,
-                creationflags=subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+                ),
             )
             return True
         except Exception:
             return False
 
     def _generate_standard_config(
-            self, suffix: str, key_type: str, action_str: str,
-            virtual_key: int, is_many: bool
+        self,
+        suffix: str,
+        key_type: str,
+        action_str: str,
+        virtual_key: int,
+        is_many: bool,
     ) -> Dict:
         """生成标准键位配置数据结构"""
         result = {"stdkey": {}, "action": {}, "intent": {}}
@@ -378,7 +410,9 @@ class SmartKeyBackend:
             result["intent"] = {base_name: {"action": action_str}}
         else:
             prefix = "ptt" if key_type.lower() == "ptt" else "sos"
-            down_name = f"many_{prefix}_down_{suffix}" if is_many else f"{prefix}_down_{suffix}"
+            down_name = (
+                f"many_{prefix}_down_{suffix}" if is_many else f"{prefix}_down_{suffix}"
+            )
             up_name = f"{prefix}_up_{suffix}"
 
             # 推导 UP Action
@@ -393,23 +427,37 @@ class SmartKeyBackend:
 
             stdkey = {
                 down_name: {"event": "KEY_DOWN", "key": virtual_key},
-                up_name: {"event": "KEY_UP", "key": virtual_key}
+                up_name: {"event": "KEY_UP", "key": virtual_key},
             }
 
-            cmd_down_list = [] if is_many else [
-                {"command": {"id": "START_SPEAK" if key_type.lower() == "ptt" else "TRIGGER_SOS"}}
-            ]
+            cmd_down_list = (
+                []
+                if is_many
+                else [
+                    {
+                        "command": {
+                            "id": (
+                                "START_SPEAK"
+                                if key_type.lower() == "ptt"
+                                else "TRIGGER_SOS"
+                            )
+                        }
+                    }
+                ]
+            )
             cmd_up_id = "STOP_SPEAK" if key_type.lower() == "ptt" else "NONE"
-            cmd_up_list = [{"command": {"id": cmd_up_id}}] if cmd_up_id != "NONE" else []
+            cmd_up_list = (
+                [{"command": {"id": cmd_up_id}}] if cmd_up_id != "NONE" else []
+            )
 
             action_data = {
                 down_name: {"default": cmd_down_list, "member": [], "new_call_in": []},
-                up_name: {"default": cmd_up_list, "member": [], "new_call_in": []}
+                up_name: {"default": cmd_up_list, "member": [], "new_call_in": []},
             }
 
             intent_data = {
                 down_name: {"action": action_str},
-                up_name: {"action": up_action_str}
+                up_name: {"action": up_action_str},
             }
 
             if key_type.lower() == "sos":
@@ -429,14 +477,16 @@ class SmartKeyBackend:
         re_keycode = re.compile(r"keyCode=(\d+)")
 
         last_process_time = 0
-        is_many_mode = (key_type.lower() == "ptt")
+        is_many_mode = key_type.lower() == "ptt"
         mode_name = "PTT" if is_many_mode else "SOS"
 
         self.log_callback(f"\n--- Start monitoring (mode：{mode_name}) ---\n")
         if self._clear_logcat():
-            self.log_callback("[Info] Log buffer cleared。\n"
-                              "\n[tip]  If no log is output after pressing the button,\n"
-                              " please enter the known key value in the terminal configuration!!!\n")
+            self.log_callback(
+                "[Info] Log buffer cleared。\n"
+                "\n[tip]  If no log is output after pressing the button,\n"
+                " please enter the known key value in the terminal configuration!!!\n"
+            )
 
         try:
             kwargs = {
@@ -448,9 +498,20 @@ class SmartKeyBackend:
                 "errors": "ignore",
             }
             if platform.system() == "Windows":
-                kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+                kwargs["creationflags"] = (
+                    subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+                )
 
-            cmd = ["adb", "-s", self.device, "logcat", "-v", "time", "*:S", "ActivityManager:I"]
+            cmd = [
+                "adb",
+                "-s",
+                self.device,
+                "logcat",
+                "-v",
+                "time",
+                "*:S",
+                "ActivityManager:I",
+            ]
             self.process = subprocess.Popen(cmd, **kwargs)
             self.is_running = True
 
@@ -480,7 +541,9 @@ class SmartKeyBackend:
                 if action_str in self.existing_actions:
                     self.skip_count += 1
                     if self.skip_count % SKIP_FEEDBACK_INTERVAL == 0:
-                        self.log_callback(f"[Skip] Action '{action_str}' already exists。\n")
+                        self.log_callback(
+                            f"[Skip] Action '{action_str}' already exists。\n"
+                        )
                     continue
 
                 last_process_time = current_time
@@ -496,7 +559,11 @@ class SmartKeyBackend:
                     new_virtual_code -= 1
 
                 new_entries = self._generate_standard_config(
-                    timestamp_suffix, key_type, action_str, new_virtual_code, is_many=is_many_mode
+                    timestamp_suffix,
+                    key_type,
+                    action_str,
+                    new_virtual_code,
+                    is_many=is_many_mode,
                 )
 
                 self.data["stdkey"].update(new_entries["stdkey"])
@@ -508,7 +575,9 @@ class SmartKeyBackend:
                 self.existing_codes.add(new_virtual_code)
 
                 created_keys = list(new_entries["stdkey"].keys())
-                self.log_callback(f"[OK] {', '.join(created_keys)} (Key: {new_virtual_code})\n")
+                self.log_callback(
+                    f"[OK] {', '.join(created_keys)} (Key: {new_virtual_code})\n"
+                )
 
                 if self.save_config(silent=True):
                     self.log_callback("[Auto-Save] ✅ Success。\n")
@@ -543,6 +612,7 @@ class SmartKeyBackend:
 
 # ==================== slclient.json处理 ====================
 
+
 def update_slclient_login_type(login_type_ui: str) -> bool:
     """
     更新slclient.json中的profile.login_mode字段
@@ -557,7 +627,10 @@ def update_slclient_login_type(login_type_ui: str) -> bool:
     # 2. 映射UI值到JSON的login_mode值
     login_mode_val = "account"  # 默认值
     for storage_key, names_dict in LOGIN_TYPE_MAPPING.items():
-        if names_dict.get("zh") == login_type_ui or names_dict.get("en") == login_type_ui:
+        if (
+            names_dict.get("zh") == login_type_ui
+            or names_dict.get("en") == login_type_ui
+        ):
             login_mode_val = storage_key
             break
 
@@ -623,6 +696,7 @@ def update_slclient_map_type(map_source_key: str) -> bool:
 
 # ==================== 前端 UI 类 ====================
 
+
 class App(ctk.CTk):
     """主应用程序窗口"""
 
@@ -653,11 +727,7 @@ class App(ctk.CTk):
         self.grid_rowconfigure(0, weight=1)
 
         # 打包配置状态管理
-        self.build_config = {
-            "env_type": "",
-            "map_source": "baidu",
-            "encoding": "amrnb"
-        }
+        self.build_config = {"env_type": "", "map_source": "baidu", "encoding": "amrnb"}
         self.slclient_options = {}
 
         # --- 新增：用于存储 Tab 的 Frame 引用 ---
@@ -690,12 +760,14 @@ class App(ctk.CTk):
             return data
 
         try:
-            with open(json_path, 'r', encoding='utf-8') as f:
+            with open(json_path, "r", encoding="utf-8") as f:
                 content = f.read().strip()
                 if content:
                     data = json.loads(content)
         except json.JSONDecodeError as e:
-            self.append_log(f"[Warning] JSON error, empty configuration  be used: {e}\n")
+            self.append_log(
+                f"[Warning] JSON error, empty configuration  be used: {e}\n"
+            )
         except Exception as e:
             self.append_log(f"[Error] Failed to read JSON file: {e}\n")
 
@@ -713,37 +785,39 @@ class App(ctk.CTk):
         self.logo_label = ctk.CTkLabel(
             self.sidebar_frame,
             text="App\nAdaptation",
-            font=ctk.CTkFont(size=20, weight="bold")
+            font=ctk.CTkFont(size=20, weight="bold"),
         )
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
 
         # 设备选择
-        self.device_label = ctk.CTkLabel(self.sidebar_frame, text=_("lbl_device"), anchor="w")
+        self.device_label = ctk.CTkLabel(
+            self.sidebar_frame, text=_("lbl_device"), anchor="w"
+        )
         self.device_label.grid(row=1, column=0, padx=20, pady=(10, 0))
         self.device_var = ctk.StringVar(value=(_("status_detecting")))
         self.device_menu = ctk.CTkOptionMenu(
             self.sidebar_frame,
             variable=self.device_var,
             values=[],
-            command=self.on_device_change
+            command=self.on_device_change,
         )
         self.device_menu.grid(row=2, column=0, padx=20, pady=5)
         self.refresh_btn = ctk.CTkButton(
             self.sidebar_frame,
             text=_("btn_refresh"),
             command=self.refresh_devices,
-            height=30
+            height=30,
         )
         self.refresh_btn.grid(row=3, column=0, padx=20, pady=5)
 
         # 监听模式
-        self.mode_label = ctk.CTkLabel(self.sidebar_frame, text=_("lbl_mode"), anchor="w")
+        self.mode_label = ctk.CTkLabel(
+            self.sidebar_frame, text=_("lbl_mode"), anchor="w"
+        )
         self.mode_label.grid(row=4, column=0, padx=20, pady=(5, 0))
         self.mode_var = ctk.StringVar(value="ptt")
         self.mode_menu = ctk.CTkOptionMenu(
-            self.sidebar_frame,
-            variable=self.mode_var,
-            values=["ptt", "sos"]
+            self.sidebar_frame, variable=self.mode_var, values=["ptt", "sos"]
         )
         self.mode_menu.grid(row=5, column=0, padx=20, pady=5)
 
@@ -752,25 +826,25 @@ class App(ctk.CTk):
             self.sidebar_frame,
             text=_("btn_start_listen"),
             fg_color="green",
-            command=self.toggle_listen
+            command=self.toggle_listen,
         )
         self.start_btn.grid(row=7, column=0, padx=20, pady=10)
         self.clear_log_btn = ctk.CTkButton(
             self.sidebar_frame,
             text=_("clear_log"),
             fg_color="gray",
-            command=self.clear_log
+            command=self.clear_log,
         )
         self.clear_log_btn.grid(row=8, column=0, padx=20, pady=10)
 
         # APK 选择区域
-        self.apk_select_label = ctk.CTkLabel(self.sidebar_frame, text=_("lbl_apk_type"), anchor="w")
+        self.apk_select_label = ctk.CTkLabel(
+            self.sidebar_frame, text=_("lbl_apk_type"), anchor="w"
+        )
         self.apk_select_label.grid(row=9, column=0, padx=20, pady=(15, 0))
 
         self.decompile_apk_btn = ctk.CTkButton(
-            self.sidebar_frame,
-            text=_("btn_decompile"),
-            command=self.decompile_apk
+            self.sidebar_frame, text=_("btn_decompile"), command=self.decompile_apk
         )
         self.decompile_apk_btn.grid(row=12, column=0, padx=20, pady=10)
 
@@ -788,13 +862,13 @@ class App(ctk.CTk):
                 _("type_middle_screen"),
                 _("type_small_screen"),
                 _("type_none_screen"),
-                _("type_custom_apk")
+                _("type_custom_apk"),
             ],
             command=self.on_apk_type_change,
             height=30,
             fg_color="#3498db",
             selected_color="#27ae60",
-            unselected_color="gray"
+            unselected_color="gray",
         )
         self.apk_type_seg.grid(row=11, column=0, padx=20, pady=5, sticky="ew")
         self.apk_type_seg.set(_("type_large_screen"))
@@ -804,7 +878,7 @@ class App(ctk.CTk):
             text=_("btn_build"),
             fg_color="#d35400",
             hover_color="#e67e22",
-            command=self.build_apk
+            command=self.build_apk,
         )
         self.build_apk_btn.grid(row=13, column=0, padx=20, pady=10)
 
@@ -823,7 +897,7 @@ class App(ctk.CTk):
             self.sidebar_frame,
             variable=self.lang_var,
             values=["中文", "English"],
-            command=self.on_language_change
+            command=self.on_language_change,
         )
         self.lang_menu.grid(row=101, column=0, padx=20, pady=8)
 
@@ -847,7 +921,7 @@ class App(ctk.CTk):
             "config": _("msg_tab_config"),
             "build": _("msg_tab_build"),
             "led": _("msg_tab_led"),
-            "terminal": _("msg_tab_apk_config")
+            "terminal": _("msg_tab_apk_config"),
         }
 
         self.tab_selector = ctk.CTkSegmentedButton(
@@ -855,25 +929,20 @@ class App(ctk.CTk):
             values=list(self.tab_names.values()),
             variable=self.selected_tab,
             command=self._on_tab_switch,
-
             # --- 1. 尺寸与圆角优化 ---
             height=32,  # 缩小高度 (原40 -> 32)，更紧凑
             width=100,  # 限制宽度，避免按钮过宽
             corner_radius=8,  # 增加圆角 (原默认较小)，让按钮更柔和
             font=ctk.CTkFont(size=13),  # 字体稍微调小一点以适配新高度
-
             # --- 2. 颜色与间隔优化 ---
             # 背景色：设置为透明或与父容器一致，这样按钮之间会有“缝隙”感
             # fg_color="transparent",
-
             # 选中项：使用品牌色，圆角由 corner_radius 控制
             selected_color="#3498db",
             selected_hover_color="#2980b9",
-
             # 未选中项：使用浅灰色，与背景形成对比
             unselected_color="green",
             unselected_hover_color="gray",
-
             # --- 3. 边框优化 ---
             # 如果需要整体外边框，可以加这个，但通常透明背景更现代
             # border_width=0,
@@ -918,7 +987,9 @@ class App(ctk.CTk):
 
         # Tab 3: Build Config (保持原样)
         frame_build = ctk.CTkFrame(self.content_container, fg_color="transparent")
-        self._init_build_config_page(frame_build)  # 注意：我们将原函数改造成接受父容器参数
+        self._init_build_config_page(
+            frame_build
+        )  # 注意：我们将原函数改造成接受父容器参数
         self.tab_frames["build"] = frame_build
 
         # Tab 4: LED Config (保持原样)
@@ -969,10 +1040,14 @@ class App(ctk.CTk):
         dialog.grab_set()
 
         # 2. 布局
-        self.label_device_model = ctk.CTkLabel(dialog, text=_("label_device_model"), font=("Microsoft YaHei", 14))
+        self.label_device_model = ctk.CTkLabel(
+            dialog, text=_("label_device_model"), font=("Microsoft YaHei", 14)
+        )
         self.label_device_model.pack(pady=15)
 
-        self.entry = ctk.CTkEntry(dialog, width=200, placeholder_text=_("placeholder_model_input"))
+        self.entry = ctk.CTkEntry(
+            dialog, width=200, placeholder_text=_("placeholder_model_input")
+        )
         self.entry.pack(pady=10)
         self.entry.focus_set()
 
@@ -996,9 +1071,13 @@ class App(ctk.CTk):
         btn_frame = ctk.CTkFrame(dialog, fg_color="transparent")
         btn_frame.pack(pady=10)
 
-        self.msg_btn_cancel = ctk.CTkButton(btn_frame, text=_("msg_btn_cancel"), width=80, command=cancel)
+        self.msg_btn_cancel = ctk.CTkButton(
+            btn_frame, text=_("msg_btn_cancel"), width=80, command=cancel
+        )
         self.msg_btn_cancel.pack(side="left", padx=10)
-        self.msg_btn_confirm = ctk.CTkButton(btn_frame, text=_("msg_btn_confirm"), width=80, command=submit)
+        self.msg_btn_confirm = ctk.CTkButton(
+            btn_frame, text=_("msg_btn_confirm"), width=80, command=submit
+        )
         self.msg_btn_confirm.pack(side="right", padx=10)
 
         dialog.update_idletasks()
@@ -1008,7 +1087,7 @@ class App(ctk.CTk):
         dialog.geometry(f"{w}x{h}+{x}+{y}")
 
         # 5. 绑定回车键事件
-        dialog.bind('<Return>', lambda event: submit())
+        dialog.bind("<Return>", lambda event: submit())
 
         # 6. 等待窗口关闭 (阻塞在这里)
         self.wait_window(dialog)
@@ -1032,7 +1111,7 @@ class App(ctk.CTk):
             "config": _("msg_tab_config"),
             "build": _("msg_tab_build"),
             "led": _("msg_tab_led"),
-            "terminal": _("msg_tab_apk_config")
+            "terminal": _("msg_tab_apk_config"),
         }
 
         # 获取当前选中的键 (通过反向查找)
@@ -1056,7 +1135,7 @@ class App(ctk.CTk):
             _("type_middle_screen"),
             _("type_small_screen"),
             _("type_none_screen"),
-            _("type_custom_apk")
+            _("type_custom_apk"),
         ]
         self._filter_terminal_folders()
         self.apk_type_seg.configure(values=new_values)
@@ -1078,7 +1157,7 @@ class App(ctk.CTk):
 
         self.update_option_menus_on_language_change()
 
-        if hasattr(self, 'opt_env'):
+        if hasattr(self, "opt_env"):
             self.opt_env.configure(command=None)
 
             new_env_options = []
@@ -1102,19 +1181,29 @@ class App(ctk.CTk):
                         env_ip_address = env_config.get("ip_address")
                         env_context = env_config.get("context")
 
-
-                        if config_context and env_context and config_context == env_context:
+                        if (
+                            config_context
+                            and env_context
+                            and config_context == env_context
+                        ):
                             if config_dns and env_ip_address:
                                 if isinstance(config_dns, list):
-                                    config_dns_str = ','.join(config_dns)
+                                    config_dns_str = ",".join(config_dns)
                                 else:
-                                    config_dns_str = str(config_dns) if config_dns else ""
+                                    config_dns_str = (
+                                        str(config_dns) if config_dns else ""
+                                    )
 
-                                dns_list = [addr.strip() for addr in env_ip_address.split(',')]
+                                dns_list = [
+                                    addr.strip() for addr in env_ip_address.split(",")
+                                ]
 
                                 # 检查配置中的DNS是否包含在环境配置的IP地址列表中
-                                if any(config_dns_str in dns_addr or dns_addr in config_dns_str for dns_addr in
-                                       dns_list):
+                                if any(
+                                    config_dns_str in dns_addr
+                                    or dns_addr in config_dns_str
+                                    for dns_addr in dns_list
+                                ):
                                     matched_env_id = env_id
                                     break
 
@@ -1122,7 +1211,9 @@ class App(ctk.CTk):
                     print(f"Error reading configuration file: {e}")
                     pass
 
-            target_display_name = ENV_DISPLAY_NAMES.get(matched_env_id, {}).get(current_lang, matched_env_id)
+            target_display_name = ENV_DISPLAY_NAMES.get(matched_env_id, {}).get(
+                current_lang, matched_env_id
+            )
             self.opt_env.set(target_display_name)
 
             self.opt_env.configure(command=self._on_env_selected)
@@ -1132,7 +1223,11 @@ class App(ctk.CTk):
         self.logo_label.configure(text=_("sidebar_logo"))
         self.device_label.configure(text=_("lbl_device"))
         self.refresh_btn.configure(text=_("btn_refresh"))
-        self.start_btn.configure(text=_("btn_start_listen") if not self.is_listening else _("btn_stop_listen"))
+        self.start_btn.configure(
+            text=(
+                _("btn_start_listen") if not self.is_listening else _("btn_stop_listen")
+            )
+        )
         self.mode_label.configure(text=_("lbl_mode"))
         self.clear_log_btn.configure(text=_("clear_log"))
         self.apk_select_label.configure(text=_("lbl_apk_type"))
@@ -1145,9 +1240,9 @@ class App(ctk.CTk):
 
         self.env_custom.configure(text=_("env_custom"))
 
-        if hasattr(self, 'sound_title_label'):
+        if hasattr(self, "sound_title_label"):
             self.sound_title_label.configure(text=i18n.get("msg_card_sound"))
-        if hasattr(self, 'map_title_label'):
+        if hasattr(self, "map_title_label"):
             self.map_title_label.configure(text=i18n.get("msg_card_map"))
 
         self.use_btn.configure(text=_("use_btn"))
@@ -1175,23 +1270,29 @@ class App(ctk.CTk):
         self.rec_channel.configure(text=_("rec_channel"))
 
         try:
-            if hasattr(self, 'model_dialog') and self.model_dialog.winfo_exists():
+            if hasattr(self, "model_dialog") and self.model_dialog.winfo_exists():
                 self.model_dialog.title(_("model_title"))
-            if hasattr(self, 'msg_btn_confirm') and self.msg_btn_confirm.winfo_exists():
+            if hasattr(self, "msg_btn_confirm") and self.msg_btn_confirm.winfo_exists():
                 self.msg_btn_confirm.configure(text=_("msg_btn_confirm"))
-            if hasattr(self, 'msg_btn_cancel') and self.msg_btn_cancel is not None:
+            if hasattr(self, "msg_btn_cancel") and self.msg_btn_cancel is not None:
                 self.msg_btn_cancel.configure(text=_("msg_btn_cancel"))
-            if hasattr(self, 'msg_btn_cancel') and self.msg_btn_cancel is not None:
+            if hasattr(self, "msg_btn_cancel") and self.msg_btn_cancel is not None:
                 self.msg_btn_cancel.configure(text=_("msg_btn_cancel"))
-            if hasattr(self, 'label_device_model') and self.label_device_model is not None:
+            if (
+                hasattr(self, "label_device_model")
+                and self.label_device_model is not None
+            ):
                 self.label_device_model.configure(text=_("label_device_model"))
-            if hasattr(self, 'placeholder_model_input') and self.entry is not None:
+            if hasattr(self, "placeholder_model_input") and self.entry is not None:
                 self.entry.configure(text=_("placeholder_model_input"))
-            if hasattr(self, 'ok_btn') and self.ok_btn is not None:
+            if hasattr(self, "ok_btn") and self.ok_btn is not None:
                 self.ok_btn.configure(text=_("btn_ok"))
-            if hasattr(self, 'btn_dialog_ok') and self.btn_dialog_ok is not None:
+            if hasattr(self, "btn_dialog_ok") and self.btn_dialog_ok is not None:
                 self.btn_dialog_ok.configure(text=_("confirm_button"))
-            if hasattr(self, 'btn_dialog_cancel') and self.btn_dialog_cancel is not None:
+            if (
+                hasattr(self, "btn_dialog_cancel")
+                and self.btn_dialog_cancel is not None
+            ):
                 self.btn_dialog_cancel.configure(text=_("cancel_button"))
 
         except tkinter.TclError:
@@ -1204,9 +1305,12 @@ class App(ctk.CTk):
         self._is_updating_language = True
 
         # --- 更新登录方式下拉框 ---
-        if hasattr(self, 'opt_login_type'):
+        if hasattr(self, "opt_login_type"):
             # a. 重新生成当前语言下的选项列表
-            login_type_display_names = [LOGIN_TYPE_MAPPING[key][i18n.current_lang] for key in LOGIN_TYPE_MAPPING.keys()]
+            login_type_display_names = [
+                LOGIN_TYPE_MAPPING[key][i18n.current_lang]
+                for key in LOGIN_TYPE_MAPPING.keys()
+            ]
             self.opt_login_type.configure(values=login_type_display_names)
 
             # b. 根据存储的原始键，恢复当前选中的显示名称
@@ -1217,13 +1321,16 @@ class App(ctk.CTk):
                 try:
                     with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
                         slclient_data = json.load(f)
-                    current_login_mode_key = slclient_data.get("profile", {}).get("login_mode", "account")
+                    current_login_mode_key = slclient_data.get("profile", {}).get(
+                        "login_mode", "account"
+                    )
                 except Exception as e:
                     print(f"[Warning] Failed to read login_mode for update: {e}")
 
             # c. 根据存储键，获取新语言下的显示名称，并设置
-            new_display_name = LOGIN_TYPE_MAPPING.get(current_login_mode_key, {}).get(i18n.current_lang,
-                                                                                      "Account Login")
+            new_display_name = LOGIN_TYPE_MAPPING.get(current_login_mode_key, {}).get(
+                i18n.current_lang, "Account Login"
+            )
             self.opt_login_type.set(new_display_name)
             # 可能还需要更新预览
             self._update_preview("login_type", new_display_name)
@@ -1236,9 +1343,12 @@ class App(ctk.CTk):
         #     # 然后根据该控件的逻辑状态恢复选中项
         #     # self.some_other_option_menu.set(...)
 
-        if hasattr(self, 'opt_map_source'):
+        if hasattr(self, "opt_map_source"):
             # a. 重新生成当前语言下的选项列表
-            map_source_display_names = [v["display_name"][i18n.current_lang] for v in MAP_CONFIG_TEMPLATES.values()]
+            map_source_display_names = [
+                v["display_name"][i18n.current_lang]
+                for v in MAP_CONFIG_TEMPLATES.values()
+            ]
             self.opt_map_source.configure(values=map_source_display_names)
 
             # b. 根据存储的原始键，恢复当前选中的显示名称
@@ -1248,8 +1358,12 @@ class App(ctk.CTk):
                     with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
                         slclient_data = json.load(f)
 
-                    current_map_source_key = slclient_data.get("lbs", {}).get("map_type", "Google")
-                    self.map_type = self.get_json_field(PATH_SLCLIENT_JSON, LBS_MAP_PYPE)
+                    current_map_source_key = slclient_data.get("lbs", {}).get(
+                        "map_type", "Google"
+                    )
+                    self.map_type = self.get_json_field(
+                        PATH_SLCLIENT_JSON, LBS_MAP_PYPE
+                    )
                     if self.map_coor == "wgs84" and self.map_type == "baidu":
                         current_map_source_key = "baidu_oversea"
                     elif self.map_coor == "bd09ll" and self.map_type == "baidu":
@@ -1261,8 +1375,11 @@ class App(ctk.CTk):
                     print(f"[Warning] Failed to read map_source for update: {e}")
 
             # c. 根据存储键，获取新语言下的显示名称，并设置
-            new_display_name = MAP_CONFIG_TEMPLATES.get(current_map_source_key, {}).get("display_name", {}).get(
-                i18n.current_lang)
+            new_display_name = (
+                MAP_CONFIG_TEMPLATES.get(current_map_source_key, {})
+                .get("display_name", {})
+                .get(i18n.current_lang)
+            )
             self.opt_map_source.set(new_display_name)
 
         # ⭐⭐⭐【关键修改】重置标志位
@@ -1300,18 +1417,27 @@ class App(ctk.CTk):
             return
 
         try:
-            out = subprocess.check_output(["adb", "devices"], text=True, stderr=subprocess.DEVNULL,
-                                          creationflags=subprocess.CREATE_NO_WINDOW
-                                          )
+            out = subprocess.check_output(
+                ["adb", "devices"],
+                text=True,
+                stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+            )
             devs = [
-                line.split()[0] for line in out.splitlines()
+                line.split()[0]
+                for line in out.splitlines()
                 if "\tdevice" in line and not line.startswith("List")
             ]
             current_val = self.device_var.get()
             self.device_menu.configure(values=devs if devs else ["no devices"])
 
             if devs:
-                if current_val not in devs or current_val in ["未连接", "未检测到设备", "检测中...", "等待环境修复"]:
+                if current_val not in devs or current_val in [
+                    "未连接",
+                    "未检测到设备",
+                    "检测中...",
+                    "等待环境修复",
+                ]:
                     self.device_var.set(devs[0])
                     self.current_device = devs[0]
                 else:
@@ -1338,7 +1464,11 @@ class App(ctk.CTk):
             messagebox.showerror("ERR", "ADB 环境丢失！")
             self.env_checker.check_all(show_dialog=True)
             return
-        if not self.current_device or self.current_device in ["未检测到设备", "ADB 错误", "未连接"]:
+        if not self.current_device or self.current_device in [
+            "未检测到设备",
+            "ADB 错误",
+            "未连接",
+        ]:
             messagebox.showerror("ERR", "请先选择有效的 ADB 设备！")
             self.refresh_devices()
             return
@@ -1356,10 +1486,12 @@ class App(ctk.CTk):
             self.backend = SmartKeyBackend(
                 self.current_device,
                 log_callback=self.append_log,
-                config_callback=self.refresh_config_view
+                config_callback=self.refresh_config_view,
             )
             if not self.backend.load_config():
-                if not messagebox.askyesno("警告", "读取配置失败，是否使用空配置继续？"):
+                if not messagebox.askyesno(
+                    "警告", "读取配置失败，是否使用空配置继续？"
+                ):
                     return
             self.is_listening = True
             self.start_btn.configure(text=_("btn_stop_listen"), fg_color="red")
@@ -1432,14 +1564,14 @@ class App(ctk.CTk):
                 i18n.get("msg_header_event"),  # "事件类型"
                 i18n.get("msg_header_vkey"),  # "虚拟keycode"
                 i18n.get("msg_header_action"),  # "Intent Action"
-                i18n.get("msg_header_cmd")  # "默认命令"
+                i18n.get("msg_header_cmd"),  # "默认命令"
             ]
             for i, h in enumerate(headers):
                 ctk.CTkLabel(
                     self.scroll_frame,
                     text=h,
                     font=ctk.CTkFont(weight="bold", size=13),
-                    anchor="w"
+                    anchor="w",
                 ).grid(row=0, column=i, padx=15, pady=15, sticky="w")
 
             # 4. 核心排序逻辑
@@ -1454,7 +1586,7 @@ class App(ctk.CTk):
                 if isinstance(key_val, int):
                     sort_key = key_val
                 else:
-                    sort_key = float('inf')
+                    sort_key = float("inf")
 
                 sortable_items.append((name, sort_key))
 
@@ -1474,20 +1606,34 @@ class App(ctk.CTk):
                 info = intents.get(name, {})
 
                 # 提取数据 (国际化 N/A)
-                event_str = sk.get("event", i18n.get("msg_not_available"))  # "N/A" -> "不可用" 或 "N/A"
-                key_val = sk.get("key", i18n.get("msg_not_available"))  # "N/A" -> "不可用" 或 "N/A"
-                action_str = info.get("action", i18n.get("msg_default_placeholder"))  # "-" -> "默认占位符" 或 "-"
+                event_str = sk.get(
+                    "event", i18n.get("msg_not_available")
+                )  # "N/A" -> "不可用" 或 "N/A"
+                key_val = sk.get(
+                    "key", i18n.get("msg_not_available")
+                )  # "N/A" -> "不可用" 或 "N/A"
+                action_str = info.get(
+                    "action", i18n.get("msg_default_placeholder")
+                )  # "-" -> "默认占位符" 或 "-"
 
                 # 提取命令 ID
                 cmds = ac.get("default", [])
                 if isinstance(cmds, list):
-                    cmd_ids = [c.get("command", {}).get("id", "") for c in cmds if isinstance(c, dict)]
+                    cmd_ids = [
+                        c.get("command", {}).get("id", "")
+                        for c in cmds
+                        if isinstance(c, dict)
+                    ]
                     cmd_str = ", ".join(filter(None, cmd_ids))
                 else:
-                    cmd_str = i18n.get("msg_default_placeholder")  # "-" -> "默认占位符" 或 "-"
+                    cmd_str = i18n.get(
+                        "msg_default_placeholder"
+                    )  # "-" -> "默认占位符" 或 "-"
 
                 if not cmd_str:
-                    cmd_str = i18n.get("msg_default_placeholder")  # "-" -> "默认占位符" 或 "-"
+                    cmd_str = i18n.get(
+                        "msg_default_placeholder"
+                    )  # "-" -> "默认占位符" 或 "-"
 
                 # 绘制行
                 # 键名
@@ -1495,15 +1641,14 @@ class App(ctk.CTk):
                     self.scroll_frame,
                     text=name,
                     anchor="w",
-                    font=ctk.CTkFont(family="Consolas", size=12)  # 使用等宽字体方便阅读长名
+                    font=ctk.CTkFont(
+                        family="Consolas", size=12
+                    ),  # 使用等宽字体方便阅读长名
                 ).grid(row=row_idx, column=0, padx=15, pady=8, sticky="w")
 
                 # 事件类型
                 ctk.CTkLabel(
-                    self.scroll_frame,
-                    text=event_str,
-                    anchor="w",
-                    text_color="#7f8c8d"
+                    self.scroll_frame, text=event_str, anchor="w", text_color="#7f8c8d"
                 ).grid(row=row_idx, column=1, padx=15, pady=8, sticky="w")
 
                 # 虚拟键码 (高亮显示)
@@ -1512,7 +1657,7 @@ class App(ctk.CTk):
                     text=str(key_val),
                     anchor="w",
                     font=ctk.CTkFont(weight="bold"),
-                    text_color="#e67e22"
+                    text_color="#e67e22",
                 ).grid(row=row_idx, column=2, padx=15, pady=8, sticky="w")
 
                 # Intent Action (蓝色)
@@ -1521,7 +1666,7 @@ class App(ctk.CTk):
                     text=action_str,
                     anchor="w",
                     text_color="#3498db",
-                    font=ctk.CTkFont(size=12)
+                    font=ctk.CTkFont(size=12),
                 ).grid(row=row_idx, column=3, padx=15, pady=8, sticky="w")
 
                 # 默认命令 (灰色)
@@ -1530,7 +1675,7 @@ class App(ctk.CTk):
                     text=cmd_str,
                     anchor="w",
                     text_color="#95a5a6",
-                    font=ctk.CTkFont(size=12)
+                    font=ctk.CTkFont(size=12),
                 ).grid(row=row_idx, column=4, padx=15, pady=8, sticky="w")
 
                 row_idx += 1
@@ -1546,7 +1691,7 @@ class App(ctk.CTk):
                 err_lbl = ctk.CTkLabel(
                     self.scroll_frame,
                     text=i18n.get("msg_load_failed") + f": {str(e)}",
-                    text_color="#c0392b"
+                    text_color="#c0392b",
                 )
                 err_lbl.grid(row=0, column=0, pady=20)
 
@@ -1569,7 +1714,9 @@ class App(ctk.CTk):
             #     text_color="#27ae60"
             # )
         else:
-            self.append_log(f"[Error] Failed to update the login mode: {selected_val}\n")
+            self.append_log(
+                f"[Error] Failed to update the login mode: {selected_val}\n"
+            )
 
     def on_apk_type_change(self, value: str) -> None:
         self.current_apk_type = value
@@ -1582,7 +1729,7 @@ class App(ctk.CTk):
         self.lbl_title = ctk.CTkLabel(
             parent,
             text=(_("msg_card_apk_properties")),  # 统一使用 i18n.get
-            font=ctk.CTkFont(size=18, weight="bold")
+            font=ctk.CTkFont(size=18, weight="bold"),
         )
         self.lbl_title.pack(pady=(15, 10))
 
@@ -1603,29 +1750,33 @@ class App(ctk.CTk):
             parent=grid_frame,
             # title="🌍 环境配置 (Environment)",
             title=i18n.get("msg_card_env"),
-            row=0, col=0,
-            content_func=self._build_env_content
+            row=0,
+            col=0,
+            content_func=self._build_env_content,
         )
         # 2. 右上：声音配置
         self.frame_sound = self._create_config_card(
             parent=grid_frame,
             title=i18n.get("msg_card_sound"),
-            row=0, col=1,
-            content_func=self._build_sound_content
+            row=0,
+            col=1,
+            content_func=self._build_sound_content,
         )
         # 3. 左下：地图配置
         self.frame_map = self._create_config_card(
             parent=grid_frame,
             title=i18n.get("msg_card_map"),
-            row=1, col=0,
-            content_func=self._build_map_content
+            row=1,
+            col=0,
+            content_func=self._build_map_content,
         )
         # 4. 右下：其他设置
         self.frame_other = self._create_config_card(
             parent=grid_frame,
             title=i18n.get("msg_card_other"),
-            row=1, col=1,
-            content_func=self._build_other_content
+            row=1,
+            col=1,
+            content_func=self._build_other_content,
         )
 
         # 初始化时加载一次默认值
@@ -1654,8 +1805,9 @@ class App(ctk.CTk):
         self.frame_led_mode = self._create_config_card(
             parent=grid_frame,
             title=_("msg_card_input"),
-            row=0, col=0,
-            content_func=self._build_input_mode_content
+            row=0,
+            col=0,
+            content_func=self._build_input_mode_content,
         )
         self.title_led_mode = self.frame_led_mode.winfo_children()[0]
         # --- 下半部分：颜色与亮度配置 ---
@@ -1663,8 +1815,9 @@ class App(ctk.CTk):
             parent=grid_frame,
             title=_("msg_card_other"),
             # title=_("msg_card_led"),
-            row=1, col=0,
-            content_func=self._build_led_color_content
+            row=1,
+            col=0,
+            content_func=self._build_led_color_content,
         )
 
         # 4. 初始化加载 (可选)
@@ -1694,11 +1847,7 @@ class App(ctk.CTk):
 
         # ===== 按钮 =====
         btn = ctk.CTkButton(
-            win,
-            text=_("btn_ok"),
-            font=text_font,
-            width=80,
-            command=win.destroy
+            win, text=_("btn_ok"), font=text_font, width=80, command=win.destroy
         )
         btn.pack(pady=10)
 
@@ -1722,7 +1871,7 @@ class App(ctk.CTk):
         self.apk_title_label = ctk.CTkLabel(
             parent,
             text=_("msg_terminal_config_title"),
-            font=ctk.CTkFont(size=20, weight="bold")
+            font=ctk.CTkFont(size=20, weight="bold"),
         )
         self.apk_title_label.pack(pady=(20, 10))
 
@@ -1736,12 +1885,14 @@ class App(ctk.CTk):
             search_frame,
             placeholder_text=_("placeholder_search_terminal"),
             textvariable=self.terminal_search_var,
-            width=200
+            width=200,
         )
         search_entry.pack(pady=5)
 
         # 滚动区域
-        self.terminal_scroll_frame = ctk.CTkScrollableFrame(parent, width=800, height=500)
+        self.terminal_scroll_frame = ctk.CTkScrollableFrame(
+            parent, width=800, height=500
+        )
         self.terminal_scroll_frame.pack(fill="both", expand=True, padx=20, pady=10)
 
         # 数据 - 分别存储全部文件夹和显示的文件夹
@@ -1753,7 +1904,7 @@ class App(ctk.CTk):
         # 绑定搜索（加防抖）
         self._search_after_id = None
         self.terminal_search_var.trace_add("write", self._on_search_change)
-        search_entry.bind('<Return>', lambda e: self._filter_terminal_folders())
+        search_entry.bind("<Return>", lambda e: self._filter_terminal_folders())
 
     def _load_terminal_folders(self):
         folder_path = "terminal_configs"
@@ -1774,8 +1925,7 @@ class App(ctk.CTk):
             self.current_displayed_folders = self.terminal_all_folders.copy()
         else:
             self.current_displayed_folders = [
-                f for f in self.terminal_all_folders
-                if search_term in f.name.lower()
+                f for f in self.terminal_all_folders if search_term in f.name.lower()
             ]
 
         self._render_terminal_folders(self.current_displayed_folders)
@@ -1790,28 +1940,23 @@ class App(ctk.CTk):
             col = index % 6
 
             icon_frame = ctk.CTkFrame(
-                self.terminal_scroll_frame,
-                width=120,
-                height=140,
-                corner_radius=10
+                self.terminal_scroll_frame, width=120, height=140, corner_radius=10
             )
             icon_frame.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
 
             self.terminal_scroll_frame.grid_columnconfigure(col, weight=1)
 
             # 图标
-            ctk.CTkLabel(
-                icon_frame,
-                text="📁",
-                font=ctk.CTkFont(size=24)
-            ).pack(pady=(10, 5))
+            ctk.CTkLabel(icon_frame, text="📁", font=ctk.CTkFont(size=24)).pack(
+                pady=(10, 5)
+            )
 
             # 名称
             name_label = ctk.CTkLabel(
                 icon_frame,
                 text=folder.name[:10] + ("..." if len(folder.name) > 10 else ""),
                 font=ctk.CTkFont(size=12),
-                wraplength=100
+                wraplength=100,
             )
             name_label.pack(pady=(0, 5))
 
@@ -1822,7 +1967,7 @@ class App(ctk.CTk):
                 height=25,
                 command=lambda f=folder: self._use_terminal_config(f),
                 fg_color="#1f6aa0",
-                hover_color="#144870"
+                hover_color="#144870",
             )
             use_btn.pack(pady=(0, 10))
             self.use_btn = use_btn
@@ -1836,22 +1981,21 @@ class App(ctk.CTk):
             self.current_displayed_folders = self.terminal_all_folders.copy()
         else:
             self.current_displayed_folders = [
-                f for f in self.terminal_all_folders
-                if search_term in f.name.lower()
+                f for f in self.terminal_all_folders if search_term in f.name.lower()
             ]
 
         self._render_terminal_folders(self.current_displayed_folders)
 
         # 强制滚动到顶部
-        self.after_idle(lambda: self.terminal_scroll_frame._parent_canvas.yview_moveto(0))
+        self.after_idle(
+            lambda: self.terminal_scroll_frame._parent_canvas.yview_moveto(0)
+        )
 
     def _on_search_change(self, *args):
         if self._search_after_id:
             self.after_cancel(self._search_after_id)
 
         self._search_after_id = self.after(50, self._filter_terminal_folders)
-
-
 
     def _use_terminal_config(self, folder_path):
         """
@@ -1909,9 +2053,9 @@ class App(ctk.CTk):
             # print(f"[success] {input_json} -> {PATH_SLCLIENT}\n")
 
             self.append_log(f"[success] Imported {folder_path.name} Successfully\n")
-            self.show_custom_message("Success", f"Imported \n"
-                                                f"\n{folder_path.name}\n"
-                                                f"\nSuccessfully !")
+            self.show_custom_message(
+                "Success", f"Imported \n" f"\n{folder_path.name}\n" f"\nSuccessfully !"
+            )
 
         except Exception as e:
             self.append_log(f"[ERROR]: {e}")
@@ -1929,51 +2073,48 @@ class App(ctk.CTk):
 
         # --- 1. 按下 PTT (Press) ---
         self.lbl_ptt_press = ctk.CTkLabel(
-            parent,
-            text=_("lbl_ptt_press"),
-            anchor="w",
-            width=label_width
+            parent, text=_("lbl_ptt_press"), anchor="w", width=label_width
         )
-        self.lbl_ptt_press.grid(row=0, column=0, padx=(pad_x, 5), pady=(pad_y, 2), sticky=sticky_label)
+        self.lbl_ptt_press.grid(
+            row=0, column=0, padx=(pad_x, 5), pady=(pad_y, 2), sticky=sticky_label
+        )
 
         self.entry_ptt_press = ctk.CTkEntry(
-            parent,
-            placeholder_text="Action for PTT_DOWN",
-            height=entry_height
+            parent, placeholder_text="Action for PTT_DOWN", height=entry_height
         )
-        self.entry_ptt_press.grid(row=0, column=1, padx=(5, pad_x), pady=(pad_y, 2), sticky=sticky_entry)
+        self.entry_ptt_press.grid(
+            row=0, column=1, padx=(5, pad_x), pady=(pad_y, 2), sticky=sticky_entry
+        )
 
         # --- 2. 抬起 PTT (Release) ---
         self.lbl_ptt_release = ctk.CTkLabel(
-            parent,
-            text=_("lbl_ptt_release"),
-            anchor="w",
-            width=label_width
+            parent, text=_("lbl_ptt_release"), anchor="w", width=label_width
         )
-        self.lbl_ptt_release.grid(row=1, column=0, padx=(pad_x, 5), pady=2, sticky=sticky_label)
+        self.lbl_ptt_release.grid(
+            row=1, column=0, padx=(pad_x, 5), pady=2, sticky=sticky_label
+        )
 
         self.entry_ptt_release = ctk.CTkEntry(
-            parent,
-            placeholder_text="Action for PTT_UP",
-            height=entry_height
+            parent, placeholder_text="Action for PTT_UP", height=entry_height
         )
-        self.entry_ptt_release.grid(row=1, column=1, padx=(5, pad_x), pady=2, sticky=sticky_entry)
+        self.entry_ptt_release.grid(
+            row=1, column=1, padx=(5, pad_x), pady=2, sticky=sticky_entry
+        )
 
         # --- 3. SOS 按键 ---
         self.lbl_sos_key = ctk.CTkLabel(
-            parent,
-            text=_("lbl_sos_key"),
-            anchor="w",
-            width=label_width
+            parent, text=_("lbl_sos_key"), anchor="w", width=label_width
         )
-        self.lbl_sos_key.grid(row=2, column=0, padx=(pad_x, 5), pady=2, sticky=sticky_label)
+        self.lbl_sos_key.grid(
+            row=2, column=0, padx=(pad_x, 5), pady=2, sticky=sticky_label
+        )
 
         self.entry_sos = ctk.CTkEntry(
-            parent,
-            placeholder_text="Action for SOS",
-            height=entry_height
+            parent, placeholder_text="Action for SOS", height=entry_height
         )
-        self.entry_sos.grid(row=2, column=1, padx=(5, pad_x), pady=2, sticky=sticky_entry)
+        self.entry_sos.grid(
+            row=2, column=1, padx=(5, pad_x), pady=2, sticky=sticky_entry
+        )
 
         # --- 4. 保存按钮 ---
 
@@ -1985,19 +2126,19 @@ class App(ctk.CTk):
             hover_color="#218838",
             height=28,
             width=25,
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
         )
-        self.btn_save_config.grid(row=3, column=0, columnspan=2, padx=pad_x, pady=(pad_y, 10), sticky="e")
+        self.btn_save_config.grid(
+            row=3, column=0, columnspan=2, padx=pad_x, pady=(pad_y, 10), sticky="e"
+        )
 
         # 状态提示
         self.lbl_env_info = ctk.CTkLabel(
-            parent,
-            text="",
-            text_color="gray",
-            font=ctk.CTkFont(size=10),
-            anchor="w"
+            parent, text="", text_color="gray", font=ctk.CTkFont(size=10), anchor="w"
         )
-        self.lbl_env_info.grid(row=4, column=0, columnspan=2, padx=pad_x, pady=(pad_y, 10), sticky="w")
+        self.lbl_env_info.grid(
+            row=4, column=0, columnspan=2, padx=pad_x, pady=(pad_y, 10), sticky="w"
+        )
 
         # --- 布局权重配置 ---
         parent.grid_columnconfigure(1, weight=1)
@@ -2023,7 +2164,7 @@ class App(ctk.CTk):
             self.lbl_env_info.configure(
                 text="❌ 错误：请至少填写 PTT (按下 + 抬起) 或 SOS 其中一项！",
                 text_color="#c0392b",
-                font=ctk.CTkFont(size=12, weight="bold")
+                font=ctk.CTkFont(size=12, weight="bold"),
             )
             return
 
@@ -2032,7 +2173,7 @@ class App(ctk.CTk):
             self.lbl_env_info.configure(
                 text="❌ 错误：请输入 PTT 的按下和抬起 Action！",
                 text_color="#c0392b",
-                font=ctk.CTkFont(size=12, weight="bold")
+                font=ctk.CTkFont(size=12, weight="bold"),
             )
             return
 
@@ -2052,7 +2193,7 @@ class App(ctk.CTk):
             existing_codes = set()
             if os.path.exists(JSON_FILE):
                 try:
-                    with open(JSON_FILE, 'r', encoding='utf-8') as f:
+                    with open(JSON_FILE, "r", encoding="utf-8") as f:
                         temp_data = json.load(f)
                         for k, v in temp_data.get("stdkey", {}).items():
                             if isinstance(v.get("key"), int):
@@ -2081,18 +2222,24 @@ class App(ctk.CTk):
                 name_ptt_down = f"many_ptt_down_{timestamp_suffix}"
                 name_ptt_up = f"ptt_up_{timestamp_suffix}"
 
-                new_entries["stdkey"][name_ptt_down] = {"event": "KEY_DOWN", "key": new_vkey_ptt}
-                new_entries["stdkey"][name_ptt_up] = {"event": "KEY_UP", "key": new_vkey_ptt}
+                new_entries["stdkey"][name_ptt_down] = {
+                    "event": "KEY_DOWN",
+                    "key": new_vkey_ptt,
+                }
+                new_entries["stdkey"][name_ptt_up] = {
+                    "event": "KEY_UP",
+                    "key": new_vkey_ptt,
+                }
 
                 new_entries["action"][name_ptt_down] = {
                     "default": [],
                     "member": [],
-                    "new_call_in": []
+                    "new_call_in": [],
                 }
                 new_entries["action"][name_ptt_up] = {
                     "default": [{"command": {"id": "STOP_SPEAK"}}],
                     "member": [],
-                    "new_call_in": []
+                    "new_call_in": [],
                 }
 
                 new_entries["intent"][name_ptt_down] = {"action": val_press}
@@ -2103,8 +2250,16 @@ class App(ctk.CTk):
                 name_sos_down = f"sos_down_{timestamp_suffix}"
                 name_sos_up = f"sos_up_{timestamp_suffix}"
 
-                new_entries["stdkey"][name_sos_down] = {"event": "KEY_CLICK", "key": new_vkey_sos, "time": 3000}
-                new_entries["stdkey"][name_sos_up] = {"event": "KEY_CLICK", "key": new_vkey_sos, "time": 3000}
+                new_entries["stdkey"][name_sos_down] = {
+                    "event": "KEY_CLICK",
+                    "key": new_vkey_sos,
+                    "time": 3000,
+                }
+                new_entries["stdkey"][name_sos_up] = {
+                    "event": "KEY_CLICK",
+                    "key": new_vkey_sos,
+                    "time": 3000,
+                }
 
                 new_entries["intent"][name_sos_down] = {"action": val_sos}
                 new_entries["intent"][name_sos_up] = {"action": val_sos}
@@ -2113,7 +2268,7 @@ class App(ctk.CTk):
             data = {}
             if os.path.exists(JSON_FILE):
                 try:
-                    with open(JSON_FILE, 'r', encoding='utf-8') as f:
+                    with open(JSON_FILE, "r", encoding="utf-8") as f:
                         data = json.load(f)
                 except json.JSONDecodeError:
                     data = {"stdkey": {}, "action": {}, "intent": {}, "custom": []}
@@ -2131,7 +2286,7 @@ class App(ctk.CTk):
             data["intent"].update(new_entries["intent"])
 
             # 5. 写回文件
-            with open(JSON_FILE, 'w', encoding='utf-8') as f:
+            with open(JSON_FILE, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
 
             # 保存成功后清空输入框
@@ -2145,9 +2300,13 @@ class App(ctk.CTk):
             # 6. 成功反馈
             msg_lines = [f"✅ Configuration is saved"]
             if has_ptt:
-                msg_lines.append(f"   🟢 PTT Key: {new_vkey_ptt} ({name_ptt_down}, {name_ptt_up})")
+                msg_lines.append(
+                    f"   🟢 PTT Key: {new_vkey_ptt} ({name_ptt_down}, {name_ptt_up})"
+                )
             if has_sos:
-                msg_lines.append(f"   🔴 SOS Key: {new_vkey_sos} ({name_sos_down}, {name_sos_up})")
+                msg_lines.append(
+                    f"   🔴 SOS Key: {new_vkey_sos} ({name_sos_down}, {name_sos_up})"
+                )
 
             final_msg = "\n".join(msg_lines)
 
@@ -2159,9 +2318,9 @@ class App(ctk.CTk):
             self.append_log(f"[Manual Save] {final_msg}\n")
             self.show_custom_message("Successfully", final_msg)
 
-            if hasattr(self, '_safe_refresh_config_view'):
+            if hasattr(self, "_safe_refresh_config_view"):
                 self._safe_refresh_config_view()
-            elif hasattr(self, 'refresh_config_view'):
+            elif hasattr(self, "refresh_config_view"):
                 self.refresh_config_view()
 
         except Exception as e:
@@ -2169,7 +2328,7 @@ class App(ctk.CTk):
             self.lbl_env_info.configure(
                 text=error_msg,
                 text_color="#c0392b",
-                font=ctk.CTkFont(size=12, weight="bold")
+                font=ctk.CTkFont(size=12, weight="bold"),
             )
             self.append_log(f"[Error] _on_save_manual_keys: {e}\n")
             messagebox.showerror("ERROR", error_msg)
@@ -2177,9 +2336,7 @@ class App(ctk.CTk):
     def _build_led_color_content(self, parent):
         """填充下半部分：颜色和亮度"""
         self.lbl_other = ctk.CTkLabel(
-            parent,
-            text=_("msg_feature_dev"),
-            text_color="gray"
+            parent, text=_("msg_feature_dev"), text_color="gray"
         )
         self.lbl_other.grid(row=2, column=0, padx=10, pady=(0, 10), sticky="w")
 
@@ -2195,7 +2352,9 @@ class App(ctk.CTk):
 
     def _create_config_card(self, parent, title, row, col, content_func):
         """辅助函数：创建一个带标题的卡片容器"""
-        card = ctk.CTkFrame(parent, corner_radius=10, border_width=1, border_color="#3B8ED0")
+        card = ctk.CTkFrame(
+            parent, corner_radius=10, border_width=1, border_color="#3B8ED0"
+        )
         card.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
 
         card.grid_columnconfigure(0, weight=1)
@@ -2228,16 +2387,14 @@ class App(ctk.CTk):
         # --- 2. 创建控件 ---
 
         # 标签
-        self.lbl_server_node = ctk.CTkLabel(parent, text=_("lbl_server_node"), anchor="w")
-        self.lbl_server_node.grid(
-            row=0, column=0, padx=5, pady=10, sticky="w"
+        self.lbl_server_node = ctk.CTkLabel(
+            parent, text=_("lbl_server_node"), anchor="w"
         )
+        self.lbl_server_node.grid(row=0, column=0, padx=5, pady=10, sticky="w")
 
         # 下拉菜单
         self.opt_env = ctk.CTkOptionMenu(
-            parent,
-            values=base_options,
-            command=self._on_env_selected
+            parent, values=base_options, command=self._on_env_selected
         )
         self.opt_env.grid(row=0, column=1, padx=5, pady=10, sticky="ew")
 
@@ -2247,14 +2404,12 @@ class App(ctk.CTk):
             text="启用手动编辑",
             command=self._toggle_custom_env_inputs,
             fg_color="#d35400",
-            state="disabled"
+            state="disabled",
         )
         self.switch_custom_env.grid_remove()
 
         self.env_custom = ctk.CTkLabel(parent, text=_("env_custom"), anchor="w")
-        self.env_custom.grid(
-            row=3, column=0, padx=5, pady=(5, 2), sticky="w"
-        )
+        self.env_custom.grid(row=3, column=0, padx=5, pady=(5, 2), sticky="w")
 
         # DNS 输入框
         ctk.CTkLabel(parent, text="DNS IP:", anchor="w").grid(
@@ -2270,7 +2425,9 @@ class App(ctk.CTk):
         )
 
         self.entry_custom_context = ctk.CTkEntry(parent, state="normal")
-        self.entry_custom_context.grid(row=5, column=1, padx=5, pady=(2, 10), sticky="ew")
+        self.entry_custom_context.grid(
+            row=5, column=1, padx=5, pady=(2, 10), sticky="ew"
+        )
 
         # upgrade_url 输入框
         ctk.CTkLabel(parent, text="upgrade url:", anchor="w").grid(
@@ -2278,15 +2435,21 @@ class App(ctk.CTk):
         )
 
         self.entry_custom_upgrade = ctk.CTkEntry(parent, state="normal")
-        self.entry_custom_upgrade.grid(row=6, column=1, padx=5, pady=(2, 10), sticky="ew")
+        self.entry_custom_upgrade.grid(
+            row=6, column=1, padx=5, pady=(2, 10), sticky="ew"
+        )
 
         self.entry_custom_ip.bind("<FocusIn>", lambda e: self.on_dns_entry_focus_in(e))
         self.entry_custom_ip.bind("<FocusOut>", self.on_dns_entry_focus_out)
 
-        self.entry_custom_context.bind("<FocusIn>", lambda e: self.on_context_entry_focus_in(e))
+        self.entry_custom_context.bind(
+            "<FocusIn>", lambda e: self.on_context_entry_focus_in(e)
+        )
         self.entry_custom_context.bind("<FocusOut>", self.on_context_entry_focus_out)
 
-        self.entry_custom_upgrade.bind("<FocusIn>", lambda e: self.on_upgrade_entry_focus_in(e))
+        self.entry_custom_upgrade.bind(
+            "<FocusIn>", lambda e: self.on_upgrade_entry_focus_in(e)
+        )
         self.entry_custom_upgrade.bind("<FocusOut>", self.on_upgrade_entry_focus_out)
 
         # 回显默认文字
@@ -2297,15 +2460,16 @@ class App(ctk.CTk):
 
         # 登录方式下拉框
         self.lbl_login_type = ctk.CTkLabel(parent, text=_("lbl_login_type"), anchor="w")
-        self.lbl_login_type.grid(
-            row=2, column=0, padx=5, pady=10, sticky="w"
-        )
+        self.lbl_login_type.grid(row=2, column=0, padx=5, pady=10, sticky="w")
 
-        login_type_display_names = [LOGIN_TYPE_MAPPING[key][i18n.current_lang] for key in LOGIN_TYPE_MAPPING.keys()]
+        login_type_display_names = [
+            LOGIN_TYPE_MAPPING[key][i18n.current_lang]
+            for key in LOGIN_TYPE_MAPPING.keys()
+        ]
         self.opt_login_type = ctk.CTkOptionMenu(
             parent,
             values=login_type_display_names,  # 使用动态生成的列表
-            command=self.on_login_type_change
+            command=self.on_login_type_change,
         )
         # self.opt_login_type.set("账号登录")
         self.opt_login_type.grid(row=2, column=1, padx=5, pady=10, sticky="ew")
@@ -2318,18 +2482,18 @@ class App(ctk.CTk):
             fg_color="#d35400",
             hover_color="#e67e22",
             height=28,
-            font=ctk.CTkFont(weight="bold")
+            font=ctk.CTkFont(weight="bold"),
         )
-        self.btn_save_custom.grid(row=7, column=0, columnspan=2, padx=5, pady=10, sticky="e")
+        self.btn_save_custom.grid(
+            row=7, column=0, columnspan=2, padx=5, pady=10, sticky="e"
+        )
         # 状态提示
         self.lbl_env_info = ctk.CTkLabel(
-            parent,
-            text="",
-            text_color="gray",
-            font=ctk.CTkFont(size=10),
-            anchor="w"
+            parent, text="", text_color="gray", font=ctk.CTkFont(size=10), anchor="w"
         )
-        self.lbl_env_info.grid(row=5, column=0, columnspan=2, padx=5, pady=(5, 10), sticky="w")
+        self.lbl_env_info.grid(
+            row=5, column=0, columnspan=2, padx=5, pady=(5, 10), sticky="w"
+        )
 
         saved = self.opt_env.get()
 
@@ -2389,7 +2553,7 @@ class App(ctk.CTk):
         """DNS输入框失去焦点时的处理 - 如果没有输入任何内容，恢复原始配置值"""
         current_content = self.entry_custom_ip.get().strip()
         if current_content == "":
-            if hasattr(self, 'original_dns_value') and self.original_dns_value:
+            if hasattr(self, "original_dns_value") and self.original_dns_value:
                 self.entry_custom_ip.delete(0, "end")
                 self.entry_custom_ip.insert(0, self.original_dns_value)
                 self.entry_custom_ip.configure(text_color="gray")
@@ -2404,7 +2568,7 @@ class App(ctk.CTk):
         """Context输入框失去焦点时的处理 - 如果没有输入任何内容，恢复原始配置值"""
         current_content = self.entry_custom_context.get().strip()
         if current_content == "":
-            if hasattr(self, 'original_context_value') and self.original_context_value:
+            if hasattr(self, "original_context_value") and self.original_context_value:
                 self.entry_custom_context.delete(0, "end")
                 self.entry_custom_context.insert(0, self.original_context_value)
                 self.entry_custom_context.configure(text_color="gray")
@@ -2419,7 +2583,7 @@ class App(ctk.CTk):
         """Upgrade URL输入框失去焦点时的处理 - 如果没有输入任何内容，恢复原始配置值"""
         current_content = self.entry_custom_upgrade.get().strip()
         if current_content == "":
-            if hasattr(self, 'original_upgrade_url') and self.original_upgrade_url:
+            if hasattr(self, "original_upgrade_url") and self.original_upgrade_url:
                 self.entry_custom_upgrade.delete(0, "end")
                 self.entry_custom_upgrade.insert(0, self.original_upgrade_url)
                 self.entry_custom_upgrade.configure(text_color="gray")
@@ -2456,7 +2620,7 @@ class App(ctk.CTk):
 
         try:
             json_path = PATH_SLCLIENT_JSON
-            with open(json_path, 'r', encoding='utf-8') as f:
+            with open(json_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
             # 3. 定位并修改 profile 节点
@@ -2473,7 +2637,7 @@ class App(ctk.CTk):
                 profile["upgrade_url"] = upgrade_url
 
             # 5. 写回文件
-            with open(json_path, 'w', encoding='utf-8') as f:
+            with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
 
             self.show_custom_message("Successfully", "saved successfully")
@@ -2508,24 +2672,25 @@ class App(ctk.CTk):
         #     command=lambda v: (self._update_preview("bgm", int(v)), lbl_bgm_val.configure(text=f"{int(v)}%")))
 
         # 2. 音效开关
-        ctk.CTkLabel(parent, text="Tone:", anchor="w").grid(row=1, column=0, padx=5, pady=8, sticky="w")
-        self.switch_tone_sfx = ctk.CTkSwitch(parent, text=" ",
-                                             command=lambda: (
-                                                 self._sync_tone_enabled_to_json(bool(self.switch_tone_sfx.get()))
-                                             ))
+        ctk.CTkLabel(parent, text="Tone:", anchor="w").grid(
+            row=1, column=0, padx=5, pady=8, sticky="w"
+        )
+        self.switch_tone_sfx = ctk.CTkSwitch(
+            parent,
+            text=" ",
+            command=lambda: (
+                self._sync_tone_enabled_to_json(bool(self.switch_tone_sfx.get()))
+            ),
+        )
         self.switch_tone_sfx.grid(row=1, column=1, padx=5, pady=6, sticky="w")
         self.switch_tone_sfx.select()  # 默认开启
 
         # 3. 语音编码
         self.codec = ctk.CTkLabel(parent, text=_("codec"), anchor="w")
-        self.codec.grid(
-            row=2, column=0, padx=5, pady=10, sticky="w"
-        )
+        self.codec.grid(row=2, column=0, padx=5, pady=10, sticky="w")
 
         self.opt_codec = ctk.CTkOptionMenu(
-            parent,
-            values=["amrnb", "evrc8k", "opus"],
-            command=self._sync_codec_to_json
+            parent, values=["amrnb", "evrc8k", "opus"], command=self._sync_codec_to_json
         )
         self.opt_codec.grid(row=2, column=1, padx=5, pady=8, sticky="ew")
 
@@ -2533,14 +2698,12 @@ class App(ctk.CTk):
 
         # 4. 音频系统
         self.audio = ctk.CTkLabel(parent, text=_("audio"), anchor="w")
-        self.audio.grid(
-            row=3, column=0, padx=5, pady=10, sticky="w"
-        )
+        self.audio.grid(row=3, column=0, padx=5, pady=10, sticky="w")
 
         self.opt_audio = ctk.CTkOptionMenu(
             parent,
             values=["default", "sles", "oem"],
-            command=self._sync_soundsystem_to_json
+            command=self._sync_soundsystem_to_json,
         )
         self.opt_audio.grid(row=3, column=1, padx=5, pady=8, sticky="ew")
 
@@ -2548,14 +2711,10 @@ class App(ctk.CTk):
 
         # 5. 播放通道
         self.play_channel = ctk.CTkLabel(parent, text=_("play_channel"), anchor="w")
-        self.play_channel.grid(
-            row=4, column=0, padx=5, pady=10, sticky="w"
-        )
+        self.play_channel.grid(row=4, column=0, padx=5, pady=10, sticky="w")
 
         self.opt_play = ctk.CTkOptionMenu(
-            parent,
-            values=["music", "voice"],
-            command=self._sync_play_to_json
+            parent, values=["music", "voice"], command=self._sync_play_to_json
         )
         self.opt_play.grid(row=4, column=1, padx=5, pady=8, sticky="ew")
 
@@ -2563,14 +2722,12 @@ class App(ctk.CTk):
 
         # 6. 录制通道
         self.rec_channel = ctk.CTkLabel(parent, text=_("rec_channel"), anchor="w")
-        self.rec_channel.grid(
-            row=5, column=0, padx=5, pady=8, sticky="w"
-        )
+        self.rec_channel.grid(row=5, column=0, padx=5, pady=8, sticky="w")
 
         self.opt_rec = ctk.CTkOptionMenu(
             parent,
             values=["mic", "voice", "communication", "recognition"],
-            command=self._sync_record_to_json
+            command=self._sync_record_to_json,
         )
         self.opt_rec.grid(row=5, column=1, padx=5, pady=10, sticky="ew")
 
@@ -2595,7 +2752,7 @@ class App(ctk.CTk):
             if current_val != selected_codec:
                 data["sound"]["codec"] = selected_codec
 
-                with open(PATH_SLCLIENT_JSON, 'w', encoding='utf-8') as f:
+                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=4, ensure_ascii=False)
 
                 self.append_log(f"[OK] Voice coding switched.: {selected_codec}\n")
@@ -2625,7 +2782,7 @@ class App(ctk.CTk):
             if current_val != selected_codec:
                 data["dsp"]["provider"] = selected_codec
 
-                with open(PATH_SLCLIENT_JSON, 'w', encoding='utf-8') as f:
+                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=4, ensure_ascii=False)
 
                 self.append_log(f"[OK] The audio system  switched.: {selected_codec}\n")
@@ -2655,7 +2812,7 @@ class App(ctk.CTk):
             if current_val != selected_codec:
                 data["dsp"]["play_stream"] = selected_codec
 
-                with open(PATH_SLCLIENT_JSON, 'w', encoding='utf-8') as f:
+                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=4, ensure_ascii=False)
 
                 self.append_log(f"[OK] Playback channel switched: {selected_codec}\n")
@@ -2685,7 +2842,7 @@ class App(ctk.CTk):
             if current_val != selected_codec:
                 data["dsp"]["record_stream"] = selected_codec
 
-                with open(PATH_SLCLIENT_JSON, 'w', encoding='utf-8') as f:
+                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=4, ensure_ascii=False)
 
                 self.append_log(f"[OK] Recording channels switched: {selected_codec}\n")
@@ -2716,7 +2873,7 @@ class App(ctk.CTk):
             if current_val != json_value:
                 data["sound"]["tone_enabled"] = json_value
 
-                with open(PATH_SLCLIENT_JSON, 'w', encoding='utf-8') as f:
+                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=4, ensure_ascii=False)
 
                 status = "开启" if json_value else "关闭"
@@ -2734,24 +2891,22 @@ class App(ctk.CTk):
         """构建地图配置内容"""
         # 1. 地图源
         self.lbl_map_source = ctk.CTkLabel(parent, text=_("lbl_map_source"), anchor="w")
-        self.lbl_map_source.grid(
-            row=0, column=0, padx=5, pady=10, sticky="w"
-        )
+        self.lbl_map_source.grid(row=0, column=0, padx=5, pady=10, sticky="w")
 
         # 动态生成当前语言下的显示名称列表
-        map_source_display_names = [v["display_name"][i18n.current_lang] for v in MAP_CONFIG_TEMPLATES.values()]
+        map_source_display_names = [
+            v["display_name"][i18n.current_lang] for v in MAP_CONFIG_TEMPLATES.values()
+        ]
         self.opt_map_source = ctk.CTkOptionMenu(
             parent, values=map_source_display_names, command=self.on_map_source_change
         )
-        self.opt_map_source.grid(
-            row=0, column=1, padx=5, pady=10, sticky="w"
-        )
+        self.opt_map_source.grid(row=0, column=1, padx=5, pady=10, sticky="w")
 
     def on_map_source_change(self, selected_display_name: str) -> None:
         """
-            地图源变更回调
-            :param selected_display_name: UI下拉框选中的显示名称 (如 "百度 [国内]")
-            """
+        地图源变更回调
+        :param selected_display_name: UI下拉框选中的显示名称 (如 "百度 [国内]")
+        """
         # 从UI显示名称反向查找存储键
 
         if not PATH_SLCLIENT_JSON.exists():
@@ -2760,8 +2915,10 @@ class App(ctk.CTk):
 
         selected_key = None
         for key, value in MAP_CONFIG_TEMPLATES.items():
-            if value["display_name"]["zh"] == selected_display_name or value["display_name"][
-                "en"] == selected_display_name:
+            if (
+                value["display_name"]["zh"] == selected_display_name
+                or value["display_name"]["en"] == selected_display_name
+            ):
                 selected_key = key
                 break
 
@@ -2774,7 +2931,9 @@ class App(ctk.CTk):
         if selected_key:
             if update_slclient_map_type(selected_key):  # 传入存储键
                 self._update_preview("map_source", selected_display_name)
-                self.append_log(f"[OK] Map source has been updated to：{selected_display_name}\n")
+                self.append_log(
+                    f"[OK] Map source has been updated to：{selected_display_name}\n"
+                )
             else:
                 current = self.opt_map_source.get()
                 messagebox.showwarning("警告", "配置更新失败，已恢复原设置")
@@ -2816,11 +2975,16 @@ class App(ctk.CTk):
         # self.entry_fps.insert(0, "60")
 
         # --- TTS开关 ---
-        ctk.CTkLabel(parent, text="TTS:", anchor="w").grid(row=1, column=0, padx=5, pady=8, sticky="w")
-        self.switch_sfx = ctk.CTkSwitch(parent, text=" ",
-                                        command=lambda: (
-                                            self._sync_tts_enabled_to_json(bool(self.switch_sfx.get()))
-                                        ))
+        ctk.CTkLabel(parent, text="TTS:", anchor="w").grid(
+            row=1, column=0, padx=5, pady=8, sticky="w"
+        )
+        self.switch_sfx = ctk.CTkSwitch(
+            parent,
+            text=" ",
+            command=lambda: (
+                self._sync_tts_enabled_to_json(bool(self.switch_sfx.get()))
+            ),
+        )
         self.switch_sfx.grid(row=1, column=1, padx=5, pady=8, sticky="w")
         self.switch_sfx.deselect()  # 默认关闭
 
@@ -2833,7 +2997,7 @@ class App(ctk.CTk):
         self.switch_launcher = ctk.CTkSwitch(
             parent,
             text="",
-            command=lambda: self.modify_manifest(bool(self.switch_launcher.get()))
+            command=lambda: self.modify_manifest(bool(self.switch_launcher.get())),
         )
         self.switch_launcher.grid(row=2, column=1, padx=5, pady=8, sticky="w")
 
@@ -2842,12 +3006,14 @@ class App(ctk.CTk):
         return f"{{{ANDROID_NAMESPACE}}}{name}"
 
     def write_pretty_xml(self, tree, file_path):
-        rough_string = ET.tostring(tree.getroot(), encoding='utf-8')
+        rough_string = ET.tostring(tree.getroot(), encoding="utf-8")
         reparsed = minidom.parseString(rough_string)
         pretty_xml = reparsed.toprettyxml(indent="    ")
 
         # 去除多余空行
-        pretty_xml = "\n".join([line for line in pretty_xml.split('\n') if line.strip()])
+        pretty_xml = "\n".join(
+            [line for line in pretty_xml.split("\n") if line.strip()]
+        )
 
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(pretty_xml)
@@ -2861,7 +3027,7 @@ class App(ctk.CTk):
 
         if not os.path.exists(manifest_path):
             self.append_log(" Error: Unable to find AndroidManifest.xml")
-            if hasattr(self, 'switch_launcher'):
+            if hasattr(self, "switch_launcher"):
                 self.switch_launcher.deselect()
             return
 
@@ -2880,7 +3046,7 @@ class App(ctk.CTk):
             candidate_activity_names = [
                 "com.shanli.pocstar.SplashActivity",
                 "com.shanlitech.ptt.SplashActivity",
-                "com.shanlitech.noscreen.SplashActivity"
+                "com.shanlitech.noscreen.SplashActivity",
             ]
 
             target_activity = None
@@ -2895,7 +3061,9 @@ class App(ctk.CTk):
                     break
 
             if target_activity is None:
-                self.append_log(f" Error: Target Activity not found (candidate:{candidate_activity_names})")
+                self.append_log(
+                    f" Error: Target Activity not found (candidate:{candidate_activity_names})"
+                )
                 self.switch_launcher.deselect()  # 复位
                 return
 
@@ -2908,17 +3076,22 @@ class App(ctk.CTk):
 
             home_category_elem = None
             for category in intent_filter.findall("category"):
-                if category.attrib.get(self.android_attr("name")) == "android.intent.category.HOME":
+                if (
+                    category.attrib.get(self.android_attr("name"))
+                    == "android.intent.category.HOME"
+                ):
                     home_category_elem = category
                     break
 
-            has_home = (home_category_elem is not None)
+            has_home = home_category_elem is not None
 
             if is_enabled:
                 if not has_home:
-                    ET.SubElement(intent_filter, "category", {
-                        self.android_attr("name"): "android.intent.category.HOME"
-                    })
+                    ET.SubElement(
+                        intent_filter,
+                        "category",
+                        {self.android_attr("name"): "android.intent.category.HOME"},
+                    )
                     self.write_pretty_xml(tree, manifest_path)
                     self.append_log(f"[ok]  set to desktop as Launcher\n")
                     # self.status_label.configure(
@@ -2942,7 +3115,7 @@ class App(ctk.CTk):
 
         except Exception as e:
             self.append_log(f" operation failed：{e}")
-            if hasattr(self, 'switch_launcher'):
+            if hasattr(self, "switch_launcher"):
                 self.switch_launcher.deselect()
 
     def _sync_tts_enabled_to_json(self, is_enabled: bool) -> None:
@@ -2961,7 +3134,7 @@ class App(ctk.CTk):
             if current_val != json_value:
                 data["tts"]["enabled"] = json_value
 
-                with open(PATH_SLCLIENT_JSON, 'w', encoding='utf-8') as f:
+                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=4, ensure_ascii=False)
 
                 status = "开启" if json_value else "关闭"
@@ -2981,17 +3154,15 @@ class App(ctk.CTk):
             return
 
         # 1. 强制清空输入框的历史内容
-        self.entry_custom_ip.delete(0, 'end')
-        self.entry_custom_context.delete(0, 'end')
+        self.entry_custom_ip.delete(0, "end")
+        self.entry_custom_context.delete(0, "end")
 
         # 2. 设置占位符提示文字（清空后必显示）
         self.entry_custom_ip.configure(
-            placeholder_text="Eg: 192.168.1:10200",
-            placeholder_text_color="#95a5a6"
+            placeholder_text="Eg: 192.168.1:10200", placeholder_text_color="#95a5a6"
         )
         self.entry_custom_context.configure(
-            placeholder_text="Eg: demoText",
-            placeholder_text_color="#95a5a6"
+            placeholder_text="Eg: demoText", placeholder_text_color="#95a5a6"
         )
 
     def _toggle_custom_env_inputs(self):
@@ -3005,35 +3176,43 @@ class App(ctk.CTk):
         if is_on:
             self.entry_custom_ip.configure(state="normal")
             self.entry_custom_context.configure(state="normal")
-            self.btn_save_custom.grid(row=4, column=0, columnspan=2, padx=5, pady=10, sticky="ew")
+            self.btn_save_custom.grid(
+                row=4, column=0, columnspan=2, padx=5, pady=10, sticky="ew"
+            )
 
             # ========== 读取 slclient.json 的 profile 并判断 ==========
             slclient_profile = None
             try:
                 if PATH_SLCLIENT_JSON.exists():
-                    with open(PATH_SLCLIENT_JSON, 'r', encoding='utf-8') as f:
+                    with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
                         slclient_data = json.load(f)
                         slclient_profile = slclient_data.get("profile", {})
             except Exception as e:
                 self.lbl_env_info.configure(
-                    text=f"ℹ读取 slclient.json 失败：{str(e)}",
-                    text_color="orange"
+                    text=f"ℹ读取 slclient.json 失败：{str(e)}", text_color="orange"
                 )
 
             if slclient_profile:
                 profile_dns = slclient_profile.get("dns", [])
                 profile_context = slclient_profile.get("context", "")
-                profile_ip = profile_dns[0] if isinstance(profile_dns, list) and profile_dns else ""
+                profile_ip = (
+                    profile_dns[0]
+                    if isinstance(profile_dns, list) and profile_dns
+                    else ""
+                )
 
                 is_in_env_conf = False
                 for env_name, env_config in ENV_CONF.items():
-                    if env_config.get("ip_address") == profile_ip and env_config.get("context") == profile_context:
+                    if (
+                        env_config.get("ip_address") == profile_ip
+                        and env_config.get("context") == profile_context
+                    ):
                         is_in_env_conf = True
                         break
 
                 if not is_in_env_conf:
-                    self.entry_custom_ip.delete(0, 'end')
-                    self.entry_custom_context.delete(0, 'end')
+                    self.entry_custom_ip.delete(0, "end")
+                    self.entry_custom_context.delete(0, "end")
                     self.entry_custom_ip.insert(0, profile_ip)
                     self.entry_custom_context.insert(0, profile_context)
                     return
@@ -3046,8 +3225,7 @@ class App(ctk.CTk):
             self.btn_save_custom.grid_remove()
 
             self.lbl_env_info.configure(
-                text=f"ℹ未保存的修改已丢弃。",
-                text_color="gray"
+                text=f"ℹ未保存的修改已丢弃。", text_color="gray"
             )
 
     def _update_config_from_custom_inputs(self):
@@ -3056,13 +3234,15 @@ class App(ctk.CTk):
         context = self.entry_custom_context.get().strip()
 
         if not ip or not context:
-            self.lbl_env_info.configure(text="⚠️ 请完整填写 IP 和 Context", text_color="orange")
+            self.lbl_env_info.configure(
+                text="⚠️ 请完整填写 IP 和 Context", text_color="orange"
+            )
             # 即使为空也先存着，等打包时再报错或忽略
             self.current_env_config = {
                 "name": "独立部署 (未配置)",
                 "ip": ip,
                 "context": context,
-                "is_custom": True
+                "is_custom": True,
             }
             return
 
@@ -3070,9 +3250,11 @@ class App(ctk.CTk):
             "name": f"独立部署 ({ip})",
             "ip": ip,
             "context": context,
-            "is_custom": True
+            "is_custom": True,
         }
-        self.lbl_env_info.configure(text=f"🔧 独立部署: {ip} | {context}", text_color="#3498db")
+        self.lbl_env_info.configure(
+            text=f"🔧 独立部署: {ip} | {context}", text_color="#3498db"
+        )
 
     def _sync_preset_node_to_json(self, node_name: str) -> None:
         """
@@ -3088,7 +3270,9 @@ class App(ctk.CTk):
         upgrade_url = config.get("upgrade_url", "")
 
         if not ip_address or not context or not upgrade_url:
-            self.append_log(f"[Warn] Node {node_name} configuration is incomplete, writing is skipped。\n")
+            self.append_log(
+                f"[Warn] Node {node_name} configuration is incomplete, writing is skipped。\n"
+            )
             return
 
         try:
@@ -3098,14 +3282,14 @@ class App(ctk.CTk):
             if "profile" not in data:
                 data["profile"] = {}
 
-            dns_list = ip_address.split(',')
+            dns_list = ip_address.split(",")
 
             data["profile"]["dns"] = dns_list
             data["profile"]["context"] = context
             data["profile"]["upgrade_url"] = upgrade_url
 
             # 写回文件
-            with open(PATH_SLCLIENT_JSON, 'w', encoding='utf-8') as f:
+            with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
 
             # self.append_log(f"[OK] Node switched: {node_name}\n")
@@ -3163,8 +3347,8 @@ class App(ctk.CTk):
     def _show_preset_info(self, node_name):
         """显示预设节点的只读信息"""
         config = ENV_CONF.get(node_name, {})
-        ip_val = config.get('ip_address', 'N/A')
-        ctx_val = config.get('context', 'N/A')
+        ip_val = config.get("ip_address", "N/A")
+        ctx_val = config.get("context", "N/A")
 
         if isinstance(ip_val, list):
             ip_val = ip_val[0] if ip_val else "N/A"
@@ -3181,7 +3365,7 @@ class App(ctk.CTk):
 
     def _update_preview(self, key, value):
         """通用配置更新回调，用于实时更新内存中的配置字典"""
-        if not hasattr(self, 'build_config'):
+        if not hasattr(self, "build_config"):
             self.build_config = {}
         self.build_config[key] = value
 
@@ -3211,22 +3395,42 @@ class App(ctk.CTk):
                 with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
                     slclient_data = json.load(f)
 
-                current_env_key = slclient_data.get("profile", {}).get("env_key", default_env_key)
+                current_env_key = slclient_data.get("profile", {}).get(
+                    "env_key", default_env_key
+                )
 
-                login_mode_val = slclient_data.get("profile", {}).get("login_mode", login_mode_val)
-                map_source_val = slclient_data.get("lbs", {}).get("map_type", map_source_val)
+                login_mode_val = slclient_data.get("profile", {}).get(
+                    "login_mode", login_mode_val
+                )
+                map_source_val = slclient_data.get("lbs", {}).get(
+                    "map_type", map_source_val
+                )
 
                 tts_enabled_val = slclient_data.get("tts", {}).get("enabled", False)
-                tone_enabled_val = slclient_data.get("sound", {}).get("tone_enabled", True)
+                tone_enabled_val = slclient_data.get("sound", {}).get(
+                    "tone_enabled", True
+                )
 
-                codec_enabled_val = slclient_data.get("sound", {}).get("codec", codec_enabled_val)
-                audio_enabled_val = slclient_data.get("dsp", {}).get("provider", audio_enabled_val)
-                play_enabled_val = slclient_data.get("dsp", {}).get("play_stream", play_enabled_val)
-                rec_enabled_val = slclient_data.get("dsp", {}).get("record_stream", rec_enabled_val)
+                codec_enabled_val = slclient_data.get("sound", {}).get(
+                    "codec", codec_enabled_val
+                )
+                audio_enabled_val = slclient_data.get("dsp", {}).get(
+                    "provider", audio_enabled_val
+                )
+                play_enabled_val = slclient_data.get("dsp", {}).get(
+                    "play_stream", play_enabled_val
+                )
+                rec_enabled_val = slclient_data.get("dsp", {}).get(
+                    "record_stream", rec_enabled_val
+                )
 
-            ui_env_val = ENV_DISPLAY_NAMES.get(current_env_key, {}).get(i18n.current_lang, "海外环境")
+            ui_env_val = ENV_DISPLAY_NAMES.get(current_env_key, {}).get(
+                i18n.current_lang, "海外环境"
+            )
 
-            ui_login_val = LOGIN_TYPE_MAPPING.get(login_mode_val, {}).get(i18n.current_lang, "账号登录")
+            ui_login_val = LOGIN_TYPE_MAPPING.get(login_mode_val, {}).get(
+                i18n.current_lang, "账号登录"
+            )
 
             self.map_coor = self.get_json_field(PATH_SLCLIENT_JSON, LBS_COOR_PATH)
 
@@ -3235,55 +3439,60 @@ class App(ctk.CTk):
             elif self.map_coor == "bd09ll" and map_source_val == "baidu":
                 map_source_val = "baidu_domestic"
 
-            ui_map_val = MAP_CONFIG_TEMPLATES.get(map_source_val, {}).get("display_name", {}).get(i18n.current_lang)
+            ui_map_val = (
+                MAP_CONFIG_TEMPLATES.get(map_source_val, {})
+                .get("display_name", {})
+                .get(i18n.current_lang)
+            )
 
-            if hasattr(self, 'opt_env'):
+            if hasattr(self, "opt_env"):
                 self.opt_env.set(ui_env_val)
                 self._update_preview("env", ui_env_val)
 
             self.opt_login_type.set(ui_login_val)
             self._update_preview("login_type", ui_login_val)
 
-            if hasattr(self, 'opt_map_source'):
+            if hasattr(self, "opt_map_source"):
                 self.opt_map_source.set(ui_map_val)
                 self._update_preview("map_source", ui_map_val)
 
-            if hasattr(self, 'switch_sfx'):
+            if hasattr(self, "switch_sfx"):
                 if tts_enabled_val:
                     self.switch_sfx.select()
                 else:
                     self.switch_sfx.deselect()
 
-            if hasattr(self, 'switch_tone_sfx'):
+            if hasattr(self, "switch_tone_sfx"):
                 if tone_enabled_val:
                     self.switch_tone_sfx.select()
                 else:
                     self.switch_tone_sfx.deselect()
 
-            if hasattr(self, 'switch_launcher'):
+            if hasattr(self, "switch_launcher"):
                 if launcher_enabled_val:
                     self.switch_launcher.select()
                 else:
                     self.switch_launcher.deselect()
 
-            if hasattr(self, 'opt_rec'):
+            if hasattr(self, "opt_rec"):
                 self.opt_rec.set(rec_enabled_val)
 
-            if hasattr(self, 'opt_play'):
+            if hasattr(self, "opt_play"):
                 self.opt_play.set(play_enabled_val)
 
-            if hasattr(self, 'opt_audio'):
+            if hasattr(self, "opt_audio"):
                 self.opt_audio.set(audio_enabled_val)
 
-            if hasattr(self, 'opt_codec'):
+            if hasattr(self, "opt_codec"):
                 self.opt_codec.set(codec_enabled_val)
-
 
         except Exception as e:
             self.append_log(f"[Warning] Failed to load configs, using default: {e}\n")
             try:
-                default_display = ENV_DISPLAY_NAMES["overseas"].get(i18n.current_lang, "海外环境")
-                if hasattr(self, 'opt_env'):
+                default_display = ENV_DISPLAY_NAMES["overseas"].get(
+                    i18n.current_lang, "海外环境"
+                )
+                if hasattr(self, "opt_env"):
                     self.opt_env.set(default_display)
             except:
                 pass
@@ -3315,7 +3524,9 @@ class App(ctk.CTk):
                 profile_data = slclient_data.get("profile", {})
                 data["env_ip"] = profile_data.get("dns", "Default")
                 data["context"] = profile_data.get("context", "pocstar")
-                data["login_type"] = profile_data.get("login_type", self.opt_login_type.get())
+                data["login_type"] = profile_data.get(
+                    "login_type", self.opt_login_type.get()
+                )
             except Exception as e:
                 print(f"Error reading slclient.json: {e}")
                 data["env_ip"] = "Default"
@@ -3356,11 +3567,11 @@ class App(ctk.CTk):
         lines = []
 
         # 环境信息
-        ip_addresses = raw_data['env_ip']
+        ip_addresses = raw_data["env_ip"]
         if isinstance(ip_addresses, list):
             ip_formatted = "\n".join([f"  - {ip}" for ip in ip_addresses])
         else:
-            ips = str(ip_addresses).split(',')
+            ips = str(ip_addresses).split(",")
             ip_formatted = "\n".join([f"  - {ip.strip()}" for ip in ips])
 
         lines.append("-" * 30)
@@ -3372,10 +3583,13 @@ class App(ctk.CTk):
             if isinstance(env_ip_address, list):
                 env_ips = env_ip_address
             else:
-                env_ips = [addr.strip() for addr in str(env_ip_address).split(',')]
+                env_ips = [addr.strip() for addr in str(env_ip_address).split(",")]
 
-            current_ips = [addr.strip() for addr in str(raw_data['env_ip']).split(',')] if not isinstance(
-                raw_data['env_ip'], list) else raw_data['env_ip']
+            current_ips = (
+                [addr.strip() for addr in str(raw_data["env_ip"]).split(",")]
+                if not isinstance(raw_data["env_ip"], list)
+                else raw_data["env_ip"]
+            )
 
             if any(ip in env_ips for ip in current_ips):
                 found_env = env_id
@@ -3427,14 +3641,18 @@ class App(ctk.CTk):
         text_font = ctk.CTkFont(size=13)
 
         # ===== 标题 =====
-        package_config_title = ctk.CTkLabel(win, text=_("package_config_title"), font=title_font)
+        package_config_title = ctk.CTkLabel(
+            win, text=_("package_config_title"), font=title_font
+        )
         package_config_title.pack(pady=(15, 5))
 
         # ===== 内容 (使用 Textbox 显示文本行) =====
         text_frame = ctk.CTkFrame(win, fg_color="transparent")
         text_frame.pack(padx=20, pady=10, fill="both", expand=True)
 
-        textbox = ctk.CTkTextbox(text_frame, font=text_font, wrap="word")  # wrap="word" 自动换行
+        textbox = ctk.CTkTextbox(
+            text_frame, font=text_font, wrap="word"
+        )  # wrap="word" 自动换行
         textbox.pack(fill="both", expand=True)
         textbox.insert("0.0", message_text)
         textbox.configure(state="disabled")  # 只读
@@ -3460,7 +3678,7 @@ class App(ctk.CTk):
             font=text_font,
             width=100,
             command=on_cancel,
-            fg_color="gray"
+            fg_color="gray",
         )
         self.btn_dialog_cancel.pack(side="left", padx=20)
 
@@ -3471,7 +3689,7 @@ class App(ctk.CTk):
             font=text_font,
             width=100,
             command=on_ok,
-            fg_color="green"
+            fg_color="green",
         )
         self.btn_dialog_ok.pack(side="left", padx=20)
 
@@ -3495,17 +3713,17 @@ class App(ctk.CTk):
 
         return result.get("confirmed", False)
 
-
-
     # 在 App 类定义之前或 __init__ 中调用
     def load_slclient_config(self):
         """启动时从 slclient.json 加载配置更新 ENV_CONF"""
         if not PATH_SLCLIENT_JSON.exists():
-            print(f"⚠️ not found {PATH_SLCLIENT_JSON}，Use default hard-coded configuration。")
+            print(
+                f"⚠️ not found {PATH_SLCLIENT_JSON}，Use default hard-coded configuration。"
+            )
             return
 
         try:
-            with open(PATH_SLCLIENT_JSON, 'r', encoding='utf-8') as f:
+            with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
             # 假设 JSON 中有 "profile" 节点，将其映射到 "海外环境"
@@ -3514,7 +3732,11 @@ class App(ctk.CTk):
                 # 更新全局 ENV_CONF 中的 "海外环境"
                 # 注意：原代码中 ip_address 是字符串，这里如果 dns 是列表，取第一个
                 dns_list = prof.get("dns", [])
-                ip_val = dns_list[0] if isinstance(dns_list, list) and dns_list else prof.get("dns", "")
+                ip_val = (
+                    dns_list[0]
+                    if isinstance(dns_list, list) and dns_list
+                    else prof.get("dns", "")
+                )
 
                 ENV_CONF["海外环境"]["context"] = prof.get("context", "pocstar")
                 ENV_CONF["海外环境"]["ip_address"] = ip_val
@@ -3549,7 +3771,9 @@ class App(ctk.CTk):
         except Exception:
             return None
 
-    def set_json_field(self, file_path: Path, field_path: List[str], new_value: Any) -> bool:
+    def set_json_field(
+        self, file_path: Path, field_path: List[str], new_value: Any
+    ) -> bool:
         """
         读取 JSON 文件，根据路径修改指定字段的值，并保存回文件。
 
@@ -3599,7 +3823,9 @@ class App(ctk.CTk):
                     self.append_log(f"[OK] Temporary file has been deleted")
                     return True
             except PermissionError:
-                self.append_log(f"[Warn] File is occupied, wait 0.5 seconds and try again... ({i + 1}/{retries})\n")
+                self.append_log(
+                    f"[Warn] File is occupied, wait 0.5 seconds and try again... ({i + 1}/{retries})\n"
+                )
                 time.sleep(0.5)
             except Exception as e:
                 self.append_log(f"[Error] Failed to delete file：{e}\n")
@@ -3607,10 +3833,10 @@ class App(ctk.CTk):
         return False
 
     def run_with_live_output(
-            self,
-            command: List[str],
-            timeout: Optional[float] = None,
-            encoding: Optional[str] = None
+        self,
+        command: List[str],
+        timeout: Optional[float] = None,
+        encoding: Optional[str] = None,
     ) -> int:
         """
         【核心改进】双线程读取 stdout/stderr 字节流，防止死锁，并实时推送到 GUI
@@ -3646,7 +3872,7 @@ class App(ctk.CTk):
                 startupinfo=startupinfo,
                 creationflags=creationflags,
                 # 明确指定编码，处理乱码问题
-                encoding=encoding
+                encoding=encoding,
             )
         except FileNotFoundError:
             self.append_log(f"[ERROR] 找不到命令或文件: {command[0]}\n")
@@ -3663,7 +3889,9 @@ class App(ctk.CTk):
             try:
                 for line in iter(stream.readline, ""):
                     if line:
-                        log_queue.put((prefix, line.rstrip('\n\r')))  # 将前缀和内容作为元组放入队列
+                        log_queue.put(
+                            (prefix, line.rstrip("\n\r"))
+                        )  # 将前缀和内容作为元组放入队列
                 stream.close()
             except Exception as e:
                 self.append_log(f"[ERROR] 读取子进程输出流时出错: {e}\n")
@@ -3672,8 +3900,12 @@ class App(ctk.CTk):
                 log_queue.put((None, None))
 
         # 启动两个守护线程，分别读取 stdout 和 stderr
-        t_out = threading.Thread(target=reader_thread, args=(process.stdout, ""), daemon=True)
-        t_err = threading.Thread(target=reader_thread, args=(process.stderr, "[ERR] "), daemon=True)
+        t_out = threading.Thread(
+            target=reader_thread, args=(process.stdout, ""), daemon=True
+        )
+        t_err = threading.Thread(
+            target=reader_thread, args=(process.stderr, "[ERR] "), daemon=True
+        )
         t_out.start()
         t_err.start()
 
@@ -3697,13 +3929,17 @@ class App(ctk.CTk):
             except queue.Empty:
                 # 检查主进程是否已经结束
                 if process.poll() is not None:
-                    remaining_timeout = timeout - (time.time() - start_time) if timeout else None
+                    remaining_timeout = (
+                        timeout - (time.time() - start_time) if timeout else None
+                    )
                     if remaining_timeout and remaining_timeout <= 0:
                         break
                     continue
 
                 if timeout is not None and (time.time() - start_time) > timeout:
-                    self.append_log(f"[TIMEOUT] 命令执行超时 ({timeout}s)，正在终止...\n")
+                    self.append_log(
+                        f"[TIMEOUT] 命令执行超时 ({timeout}s)，正在终止...\n"
+                    )
                     process.terminate()
                     try:
                         process.wait(timeout=5)  # 给予5秒时间优雅关闭
@@ -3755,8 +3991,7 @@ class App(ctk.CTk):
             self.after(0, lambda: None)
 
             apk_path = filedialog.askopenfilename(
-                title="APK File",
-                filetypes=[("APK File", "*.apk")]
+                title="APK File", filetypes=[("APK File", "*.apk")]
             )
 
             if not apk_path:
@@ -3778,8 +4013,14 @@ class App(ctk.CTk):
 
         # 3. 执行命令
         command = [
-            "java", "-jar", str(APKTOOL_JAR),
-            "d", apk_path, "-s", "-o", output_dir
+            "java",
+            "-jar",
+            str(APKTOOL_JAR),
+            "d",
+            apk_path,
+            "-s",
+            "-o",
+            output_dir,
         ]
 
         exit_code = self.run_with_live_output(command)
@@ -3788,20 +4029,26 @@ class App(ctk.CTk):
             end_time = time.time()
 
             if apk_type in ["中屏", "Middle APK"]:
-                self.append_log("[Info] Middle screen mode detected. Updating config...\n")
+                self.append_log(
+                    "[Info] Middle screen mode detected. Updating config...\n"
+                )
 
                 json_file = PATH_SLCLIENT_JSON
                 field_path = ["ui", "launcherModule"]
                 new_value = "middle"
 
                 if self.set_json_field(json_file, field_path, new_value):
-                    self.append_log(f"[Success] Auto-config: ui.launcherModule set to '{new_value}'\n")
+                    self.append_log(
+                        f"[Success] Auto-config: ui.launcherModule set to '{new_value}'\n"
+                    )
                 else:
                     self.append_log("[Warning] Config update failed after unzip.\n")
 
             self.load_and_echo_config_after_unzip()
 
-            self.append_log(f"[SUCCESS] ✅  time spent: {(end_time - start_time):.2f}s\n")
+            self.append_log(
+                f"[SUCCESS] ✅  time spent: {(end_time - start_time):.2f}s\n"
+            )
 
         return exit_code == 0
 
@@ -3809,7 +4056,7 @@ class App(ctk.CTk):
         """
         【多线程入口】启动反编译任务，不阻塞 UI。
         """
-        if hasattr(self, '_is_decompiling') and self._is_decompiling:
+        if hasattr(self, "_is_decompiling") and self._is_decompiling:
             self.append_log("[Info] 反编译正在进行中...\n")
             return
 
@@ -3837,8 +4084,7 @@ class App(ctk.CTk):
 
     def upload_apk(self):
         file_path = filedialog.askopenfilename(
-            title="选择APK文件",
-            filetypes=[("APK Files", "*.apk")]
+            title="选择APK文件", filetypes=[("APK Files", "*.apk")]
         )
 
         if file_path:
@@ -3847,7 +4093,7 @@ class App(ctk.CTk):
 
     def build_apk(self) -> None:
         """主打包入口
-            解压只要打包app_out即可
+        解压只要打包app_out即可
         """
         start_time = time.time()
         if not PATH_SLCLIENT_JSON.exists():
@@ -3864,7 +4110,9 @@ class App(ctk.CTk):
 
         def task():
             try:
-                self.append_log(f"\n[Step 1]=== Start  package process ({apk_type}) ===\n")
+                self.append_log(
+                    f"\n[Step 1]=== Start  package process ({apk_type}) ===\n"
+                )
 
                 # # 1. 反编译
                 # self.append_log("[Step 1] Decompiling APK...\n")
@@ -3904,8 +4152,13 @@ class App(ctk.CTk):
                 # 3. 构建未签名 APK
                 self.append_log("\n[Step 3] Packing APK...\n")
                 apktool_cmd = [
-                    "java", "-jar", str(APKTOOL_JAR),
-                    "b", TEMP_DIR, "-o", "app-unsigned-unaligned.apk"
+                    "java",
+                    "-jar",
+                    str(APKTOOL_JAR),
+                    "b",
+                    TEMP_DIR,
+                    "-o",
+                    "app-unsigned-unaligned.apk",
                 ]
                 if self.run_with_live_output(apktool_cmd) != 0:
                     raise Exception("APK packaging failed")
@@ -3913,8 +4166,12 @@ class App(ctk.CTk):
                 # 4. Zipalign 对齐
                 self.append_log("[Step 4] Aligning APK...\n")
                 zipalign_cmd = [
-                    str(ZIPALIGN_EXE), "-v", "-p", "4",
-                    "app-unsigned-unaligned.apk", "app-unsigned.apk"
+                    str(ZIPALIGN_EXE),
+                    "-v",
+                    "-p",
+                    "4",
+                    "app-unsigned-unaligned.apk",
+                    "app-unsigned.apk",
                 ]
                 if self.run_with_live_output(zipalign_cmd) != 0:
                     raise Exception("APK alignment failed")
@@ -3930,7 +4187,9 @@ class App(ctk.CTk):
                 json_val = self.get_json_field(PATH_SLCLIENT_JSON, LAUNCHER_MODULE_PATH)
                 if json_val and json_val in KEYSTORE_CONFIG:
                     key = json_val
-                    self.append_log(f"[Info] JSON configuration detected, signature type used：{key}\n")
+                    self.append_log(
+                        f"[Info] JSON configuration detected, signature type used：{key}\n"
+                    )
 
                 ks_info = KEYSTORE_CONFIG.get(key, KEYSTORE_CONFIG["large"])
                 ks_path = ks_info["path"]
@@ -3943,16 +4202,23 @@ class App(ctk.CTk):
                 output_dir_path = PROJECT_PATH / date_str
                 output_dir_path.mkdir(exist_ok=True)
 
-                final_name = self.build_newname(PATH_YML) if os.path.exists(
-                    PATH_YML) else f"app_{apk_type}_{date_str}.apk"
+                final_name = (
+                    self.build_newname(PATH_YML)
+                    if os.path.exists(PATH_YML)
+                    else f"app_{apk_type}_{date_str}.apk"
+                )
                 output_apk_path = output_dir_path / final_name
 
                 apksigner_cmd = [
-                    str(APKSIGNER_BAT), "sign",
-                    "--ks", str(ks_path),
-                    "--ks-pass", f"pass:{ks_pass}",
-                    "--out", str(output_apk_path),
-                    "app-unsigned.apk"
+                    str(APKSIGNER_BAT),
+                    "sign",
+                    "--ks",
+                    str(ks_path),
+                    "--ks-pass",
+                    f"pass:{ks_pass}",
+                    "--out",
+                    str(output_apk_path),
+                    "app-unsigned.apk",
                 ]
 
                 if self.run_with_live_output(apksigner_cmd) != 0:
@@ -3966,7 +4232,9 @@ class App(ctk.CTk):
                 # 初始化界面
                 self.load_all_configs()
                 end_time = time.time()
-                self.append_log(f"[SUCCESS] ✅  time spent: {(end_time - start_time):.2f}s\n")
+                self.append_log(
+                    f"[SUCCESS] ✅  time spent: {(end_time - start_time):.2f}s\n"
+                )
                 self.show_custom_message("SUCCESS", f"APK Safe: \n{output_apk_path}")
 
             except Exception as e:
@@ -3987,7 +4255,9 @@ class App(ctk.CTk):
 
         try:
             shutil.copy2(source_dir_color, target_dir_color)
-            self.append_log(f"overwritten file：{source_dir_color} -> {target_dir_color}")
+            self.append_log(
+                f"overwritten file：{source_dir_color} -> {target_dir_color}"
+            )
         except Exception as e:
             self.append_log(f"coverage failure：{e}")
 
@@ -4000,7 +4270,9 @@ class App(ctk.CTk):
         new_version_name = re.sub(pattern, rf"\1{timestamp}", version_name)
 
         if new_version_name == version_name:
-            self.append_log(f"[Warn] Number format that does not match to the end：{version_name}\n")
+            self.append_log(
+                f"[Warn] Number format that does not match to the end：{version_name}\n"
+            )
             return f"{version_name}_{timestamp}"
         return new_version_name
 
@@ -4038,7 +4310,9 @@ class App(ctk.CTk):
         old_name = version_info.get("versionName")
 
         if not old_code or not old_name:
-            self.append_log("[Warn]Unable to obtain version information, skipping update\n")
+            self.append_log(
+                "[Warn]Unable to obtain version information, skipping update\n"
+            )
             return
 
         new_code = self.increment_version_code(old_code)
@@ -4050,41 +4324,49 @@ class App(ctk.CTk):
         with open(yml_path, "w", encoding="utf-8") as f:
             yaml.dump(data, f)
 
-        self.append_log(f"[Version]update successful：{old_name}->{new_name}, Code: {old_code}->{new_code}\n")
+        self.append_log(
+            f"[Version]update successful：{old_name}->{new_name}, Code: {old_code}->{new_code}\n"
+        )
 
     def build_newname(self, yml_path: Path) -> str:
         try:
-            launcher_module = self.get_json_field(PATH_SLCLIENT_JSON, LAUNCHER_MODULE_PATH)
+            launcher_module = self.get_json_field(
+                PATH_SLCLIENT_JSON, LAUNCHER_MODULE_PATH
+            )
             version_str = self.get_version_info(yml_path)[1]
-            recorder_module = self.get_json_field(PATH_SLCLIENT_JSON, RECORDER_ENABLE_PATH)
+            recorder_module = self.get_json_field(
+                PATH_SLCLIENT_JSON, RECORDER_ENABLE_PATH
+            )
 
-            raw_model = getattr(self, 'current_device_model', 'Unknown')
+            raw_model = getattr(self, "current_device_model", "Unknown")
             device_model = str(raw_model)
 
             if not device_model or device_model.strip() == "":
                 new_version_name = version_str
             else:
-                new_version_name = re.sub(r'(POCSTARS_)', r'\g<1>' + device_model + '_', version_str)
+                new_version_name = re.sub(
+                    r"(POCSTARS_)", r"\g<1>" + device_model + "_", version_str
+                )
             if recorder_module:
-                newname = 'RSAPP_' + str(new_version_name) + '.apk'
+                newname = "RSAPP_" + str(new_version_name) + ".apk"
 
             elif launcher_module is None:
-                newname = 'ASAPP_' + str(new_version_name) + '.apk'
-            elif launcher_module == 'large':
-                newname = 'BSAPP_' + str(new_version_name) + '.apk'
-            elif launcher_module == 'middle':
-                newname = 'MSAPP_' + str(new_version_name) + '.apk'
-            elif launcher_module == 'small':
-                newname = 'SSAPP_' + str(new_version_name) + '.apk'
+                newname = "ASAPP_" + str(new_version_name) + ".apk"
+            elif launcher_module == "large":
+                newname = "BSAPP_" + str(new_version_name) + ".apk"
+            elif launcher_module == "middle":
+                newname = "MSAPP_" + str(new_version_name) + ".apk"
+            elif launcher_module == "small":
+                newname = "SSAPP_" + str(new_version_name) + ".apk"
             else:
-                newname = 'NSAPP_' + str(new_version_name) + '.apk'
+                newname = "NSAPP_" + str(new_version_name) + ".apk"
 
-            self.append_log(f'[Info] Changed name to {newname}')
+            self.append_log(f"[Info] Changed name to {newname}")
             return newname
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            self.append_log(f'[ERR]:{e}')
+            self.append_log(f"[ERR]:{e}")
             return f"APP_test_{timestamp}.apk"
 
     def get_field_value_from_yml(self, yml_path: Path, field_name: str) -> Dict:
@@ -4096,6 +4378,7 @@ class App(ctk.CTk):
 
 
 # ==================== 国际化多语言支持 ====================
+
 
 class I18N:
     def __init__(self):
@@ -4112,7 +4395,7 @@ class I18N:
             return False
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 self.translations = json.load(f)
             self.current_lang = lang_code
             return True

@@ -7,7 +7,13 @@ import threading
 import platform
 from datetime import datetime
 from typing import Optional, Set, List, Any, Dict
-from .constants import JSON_FILE, DEFAULT_CUSTOM_LIST, DEBOUNCE_SECONDS, SKIP_FEEDBACK_INTERVAL
+from .constants import (
+    JSON_FILE,
+    DEFAULT_CUSTOM_LIST,
+    DEBOUNCE_SECONDS,
+    SKIP_FEEDBACK_INTERVAL,
+)
+
 
 class SmartKeyBackend:
     """ADB 监听与配置生成后端"""
@@ -29,8 +35,10 @@ class SmartKeyBackend:
         """加载本地 input.json 配置"""
         if not os.path.exists(JSON_FILE):
             self.data = {
-                "stdkey": {}, "action": {}, "intent": {},
-                "custom": DEFAULT_CUSTOM_LIST.copy()
+                "stdkey": {},
+                "action": {},
+                "intent": {},
+                "custom": DEFAULT_CUSTOM_LIST.copy(),
             }
             self.existing_actions = set()
             self.existing_codes = set()
@@ -41,11 +49,13 @@ class SmartKeyBackend:
                 self.data = json.load(f)
 
             self.existing_actions = {
-                info.get("action") for name, info in self.data.get("intent", {}).items()
+                info.get("action")
+                for name, info in self.data.get("intent", {}).items()
                 if info.get("action")
             }
             self.existing_codes = {
-                info.get("key") for name, info in self.data.get("stdkey", {}).items()
+                info.get("key")
+                for name, info in self.data.get("stdkey", {}).items()
                 if info.get("key") is not None
             }
 
@@ -58,8 +68,10 @@ class SmartKeyBackend:
         except Exception as e:
             self.log_callback(f"[Error] Failed to read configuration：{e}\n")
             self.data = {
-                "stdkey": {}, "action": {}, "intent": {},
-                "custom": DEFAULT_CUSTOM_LIST.copy()
+                "stdkey": {},
+                "action": {},
+                "intent": {},
+                "custom": DEFAULT_CUSTOM_LIST.copy(),
             }
             self.existing_actions = set()
             self.existing_codes = set()
@@ -87,7 +99,11 @@ class SmartKeyBackend:
                     ["taskkill", "/F", "/T", "/PID", str(self.process.pid)],
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
-                    creationflags=subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+                    creationflags=(
+                        subprocess.CREATE_NO_WINDOW
+                        if platform.system() == "Windows"
+                        else 0
+                    ),
                 )
             else:
                 self.process.terminate()
@@ -109,15 +125,21 @@ class SmartKeyBackend:
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 timeout=5,
-                creationflags=subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+                ),
             )
             return True
         except Exception:
             return False
 
     def _generate_standard_config(
-            self, suffix: str, key_type: str, action_str: str,
-            virtual_key: int, is_many: bool
+        self,
+        suffix: str,
+        key_type: str,
+        action_str: str,
+        virtual_key: int,
+        is_many: bool,
     ) -> Dict:
         """生成标准键位配置数据结构"""
         result = {"stdkey": {}, "action": {}, "intent": {}}
@@ -131,7 +153,9 @@ class SmartKeyBackend:
             result["intent"] = {base_name: {"action": action_str}}
         else:
             prefix = "ptt" if key_type.lower() == "ptt" else "sos"
-            down_name = f"many_{prefix}_down_{suffix}" if is_many else f"{prefix}_down_{suffix}"
+            down_name = (
+                f"many_{prefix}_down_{suffix}" if is_many else f"{prefix}_down_{suffix}"
+            )
             up_name = f"{prefix}_up_{suffix}"
 
             if action_str.endswith(".down"):
@@ -145,23 +169,37 @@ class SmartKeyBackend:
 
             stdkey = {
                 down_name: {"event": "KEY_DOWN", "key": virtual_key},
-                up_name: {"event": "KEY_UP", "key": virtual_key}
+                up_name: {"event": "KEY_UP", "key": virtual_key},
             }
 
-            cmd_down_list = [] if is_many else [
-                {"command": {"id": "START_SPEAK" if key_type.lower() == "ptt" else "TRIGGER_SOS"}}
-            ]
+            cmd_down_list = (
+                []
+                if is_many
+                else [
+                    {
+                        "command": {
+                            "id": (
+                                "START_SPEAK"
+                                if key_type.lower() == "ptt"
+                                else "TRIGGER_SOS"
+                            )
+                        }
+                    }
+                ]
+            )
             cmd_up_id = "STOP_SPEAK" if key_type.lower() == "ptt" else "NONE"
-            cmd_up_list = [{"command": {"id": cmd_up_id}}] if cmd_up_id != "NONE" else []
+            cmd_up_list = (
+                [{"command": {"id": cmd_up_id}}] if cmd_up_id != "NONE" else []
+            )
 
             action_data = {
                 down_name: {"default": cmd_down_list, "member": [], "new_call_in": []},
-                up_name: {"default": cmd_up_list, "member": [], "new_call_in": []}
+                up_name: {"default": cmd_up_list, "member": [], "new_call_in": []},
             }
 
             intent_data = {
                 down_name: {"action": action_str},
-                up_name: {"action": up_action_str}
+                up_name: {"action": up_action_str},
             }
 
             if key_type.lower() == "sos":
@@ -179,14 +217,16 @@ class SmartKeyBackend:
         re_keycode = re.compile(r"keyCode=(\d+)")
 
         last_process_time = 0
-        is_many_mode = (key_type.lower() == "ptt")
+        is_many_mode = key_type.lower() == "ptt"
         mode_name = "PTT" if is_many_mode else "SOS"
 
         self.log_callback(f"\n--- Start monitoring (mode：{mode_name}) ---\n")
         if self._clear_logcat():
-            self.log_callback("[Info] Log buffer cleared。\n"
-                              "\n[tip]  If no log is output after pressing the button,\n"
-                              " please enter the known key value in the terminal configuration!!!\n")
+            self.log_callback(
+                "[Info] Log buffer cleared。\n"
+                "\n[tip]  If no log is output after pressing the button,\n"
+                " please enter the known key value in the terminal configuration!!!\n"
+            )
 
         try:
             kwargs = {
@@ -198,9 +238,20 @@ class SmartKeyBackend:
                 "errors": "ignore",
             }
             if platform.system() == "Windows":
-                kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+                kwargs["creationflags"] = (
+                    subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+                )
 
-            cmd = ["adb", "-s", self.device, "logcat", "-v", "time", "*:S", "ActivityManager:I"]
+            cmd = [
+                "adb",
+                "-s",
+                self.device,
+                "logcat",
+                "-v",
+                "time",
+                "*:S",
+                "ActivityManager:I",
+            ]
             self.process = subprocess.Popen(cmd, **kwargs)
             self.is_running = True
 
@@ -230,7 +281,9 @@ class SmartKeyBackend:
                 if action_str in self.existing_actions:
                     self.skip_count += 1
                     if self.skip_count % SKIP_FEEDBACK_INTERVAL == 0:
-                        self.log_callback(f"[Skip] Action '{action_str}' already exists。\n")
+                        self.log_callback(
+                            f"[Skip] Action '{action_str}' already exists。\n"
+                        )
                     continue
 
                 last_process_time = current_time
@@ -246,7 +299,11 @@ class SmartKeyBackend:
                     new_virtual_code -= 1
 
                 new_entries = self._generate_standard_config(
-                    timestamp_suffix, key_type, action_str, new_virtual_code, is_many=is_many_mode
+                    timestamp_suffix,
+                    key_type,
+                    action_str,
+                    new_virtual_code,
+                    is_many=is_many_mode,
                 )
 
                 self.data["stdkey"].update(new_entries["stdkey"])
@@ -258,7 +315,9 @@ class SmartKeyBackend:
                 self.existing_codes.add(new_virtual_code)
 
                 created_keys = list(new_entries["stdkey"].keys())
-                self.log_callback(f"[OK] {', '.join(created_keys)} (Key: {new_virtual_code})\n")
+                self.log_callback(
+                    f"[OK] {', '.join(created_keys)} (Key: {new_virtual_code})\n"
+                )
 
                 if self.save_config(silent=True):
                     self.log_callback("[Auto-Save] ✅ Success。\n")

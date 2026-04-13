@@ -14,25 +14,25 @@ ENV_CONF = {
     "overseas": {
         "ip_address": "sgdns.shanlipoc.com:10200,usdns.shanlipoc.com:10200",
         "context": "pocstar",
-        "upgrade_url": "upgrade.pocstar.com"
+        "upgrade_url": "upgrade.pocstar.com",
     },
     "domestic_v2": {
         "ip_address": "cndns.shanliptt.com:10200",
         "context": "show",
-        "upgrade_url": "upgrade.shanliptt.com"
+        "upgrade_url": "upgrade.shanliptt.com",
     },
 }
 
 # 2. 显示名称映射
 ENV_DISPLAY_NAMES = {
     "overseas": {"zh": "海外环境", "en": "Overseas Env"},
-    "domestic_v2": {"zh": "国内环境2.0", "en": "Domestic 2.0"}
+    "domestic_v2": {"zh": "国内环境2.0", "en": "Domestic 2.0"},
 }
 
 LOGIN_TYPE_MAPPING = {
     "account": {"zh": "账号登录", "en": "Account Login"},
     "serial": {"zh": "IMEI登录", "en": "IMEI Login"},
-    "iccid": {"zh": "ICCID登录", "en": "ICCID Login"}
+    "iccid": {"zh": "ICCID登录", "en": "ICCID Login"},
 }
 
 MAP_CONFIG_TEMPLATES = {
@@ -45,8 +45,8 @@ MAP_CONFIG_TEMPLATES = {
             "provider": "baidu",
             "coor": "bd09ll",
             "update_period_sec": 40,
-            "report_period_sec": 40
-        }
+            "report_period_sec": 40,
+        },
     },
     "baidu_oversea": {
         "display_name": {"zh": "百度 [海外]", "en": "Baidu [Oversea]"},
@@ -57,8 +57,8 @@ MAP_CONFIG_TEMPLATES = {
             "provider": "baidu",
             "coor": "wgs84",
             "update_period_sec": 40,
-            "report_period_sec": 40
-        }
+            "report_period_sec": 40,
+        },
     },
     "google": {
         "display_name": {"zh": "谷歌", "en": "Google"},
@@ -69,8 +69,8 @@ MAP_CONFIG_TEMPLATES = {
             "provider": "google",
             "coor": "wgs84",
             "update_period_sec": 40,
-            "report_period_sec": 40
-        }
+            "report_period_sec": 40,
+        },
     },
     "none": {
         "display_name": {"zh": "GPS", "en": "GPS"},
@@ -81,9 +81,9 @@ MAP_CONFIG_TEMPLATES = {
             "provider": "default",
             "coor": "wgs84",
             "update_period_sec": 40,
-            "report_period_sec": 40
-        }
-    }
+            "report_period_sec": 40,
+        },
+    },
 }
 
 # 关键文件路径
@@ -125,7 +125,7 @@ DEFAULT_CUSTOM_LIST = [
     "switch_group_name_tts",
     "switch_group_click",
     "join_prev_group",
-    "new_call_in"
+    "new_call_in",
 ]
 
 SKIP_FEEDBACK_INTERVAL = 5

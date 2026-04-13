@@ -6,6 +6,7 @@ from typing import List
 import customtkinter as ctk
 from .i18n import _
 
+
 def check_command(cmd: str) -> bool:
     """检查命令是否在系统 PATH 中"""
     return shutil.which(cmd) is not None
@@ -21,7 +22,9 @@ def is_adb_installed() -> bool:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             timeout=15,
-            creationflags=subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            ),
         )
         return result.returncode == 0
     except Exception:
@@ -38,7 +41,9 @@ def is_java_installed() -> bool:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             timeout=15,
-            creationflags=subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            ),
         )
         return result.returncode == 0
     except Exception:
@@ -49,12 +54,16 @@ def show_env_error_dialog(parent: ctk.CTk, missing_list: List[str]) -> None:
     """显示环境缺失的弹窗"""
     msg = "System environment check failed：\n\n"
     if "ADB" in missing_list:
-        msg += "❌ ADB (Android Debug Bridge)\n   " \
-               "Decompress and install ADB compressed package in Env\n" \
-               ", and set system variables.。\n"
+        msg += (
+            "❌ ADB (Android Debug Bridge)\n   "
+            "Decompress and install ADB compressed package in Env\n"
+            ", and set system variables.。\n"
+        )
     if "JAVA" in missing_list:
-        msg += "❌ Java (JDK/JRE)\n   " \
-               "Solution: extract the JDK compressed package in Env and install it.\n"
+        msg += (
+            "❌ Java (JDK/JRE)\n   "
+            "Solution: extract the JDK compressed package in Env and install it.\n"
+        )
     msg += "\nPlease install the missing components and click [Retry Detection].。"
 
     dialog = ctk.CTkToplevel(parent)
@@ -78,8 +87,12 @@ def show_env_error_dialog(parent: ctk.CTk, missing_list: List[str]) -> None:
         parent.quit()
         sys.exit(0)
 
-    ctk.CTkButton(btn_frame, text="重试检测", command=on_retry, fg_color="green").pack(side="left", padx=10)
-    ctk.CTkButton(btn_frame, text="退出程序", command=on_exit, fg_color="red").pack(side="left", padx=10)
+    ctk.CTkButton(btn_frame, text="重试检测", command=on_retry, fg_color="green").pack(
+        side="left", padx=10
+    )
+    ctk.CTkButton(btn_frame, text="退出程序", command=on_exit, fg_color="red").pack(
+        side="left", padx=10
+    )
 
 
 class EnvChecker:
@@ -97,6 +110,8 @@ class EnvChecker:
 
         if missing:
             if show_dialog:
-                self.parent.after(0, lambda: show_env_error_dialog(self.parent, missing))
+                self.parent.after(
+                    0, lambda: show_env_error_dialog(self.parent, missing)
+                )
             return False
         return True

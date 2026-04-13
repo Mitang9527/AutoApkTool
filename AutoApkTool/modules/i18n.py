@@ -3,6 +3,7 @@ import json
 
 # ==================== 国际化多语言支持 ====================
 
+
 class I18N:
     def __init__(self):
         self.current_lang = "en"  # 默认中文
@@ -18,7 +19,7 @@ class I18N:
             return False
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 self.translations = json.load(f)
             self.current_lang = lang_code
             return True

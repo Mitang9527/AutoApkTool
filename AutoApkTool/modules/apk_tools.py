@@ -11,11 +11,12 @@ from typing import List, Optional, Dict, Any
 from .constants import APKTOOL_JAR, PROJECT_PATH
 from .utils import load_yml
 
+
 def run_with_live_output(
-        app_instance,
-        command: List[str],
-        timeout: Optional[float] = None,
-        encoding: Optional[str] = None
+    app_instance,
+    command: List[str],
+    timeout: Optional[float] = None,
+    encoding: Optional[str] = None,
 ) -> int:
     """
     【核心改进】双线程读取 stdout/stderr 字节流，防止死锁，并实时推送到 GUI
@@ -40,7 +41,7 @@ def run_with_live_output(
             universal_newlines=True,
             startupinfo=startupinfo,
             creationflags=creationflags,
-            encoding=encoding
+            encoding=encoding,
         )
     except FileNotFoundError:
         app_instance.append_log(f"[ERROR] 找不到命令或文件: {command[0]}\n")
@@ -55,15 +56,19 @@ def run_with_live_output(
         try:
             for line in iter(stream.readline, ""):
                 if line:
-                    log_queue.put((prefix, line.rstrip('\n\r')))
+                    log_queue.put((prefix, line.rstrip("\n\r")))
             stream.close()
         except Exception as e:
             app_instance.append_log(f"[ERROR] 读取子进程输出流时出错: {e}\n")
         finally:
             log_queue.put((None, None))
 
-    t_out = threading.Thread(target=reader_thread, args=(process.stdout, ""), daemon=True)
-    t_err = threading.Thread(target=reader_thread, args=(process.stderr, "[ERR] "), daemon=True)
+    t_out = threading.Thread(
+        target=reader_thread, args=(process.stdout, ""), daemon=True
+    )
+    t_err = threading.Thread(
+        target=reader_thread, args=(process.stderr, "[ERR] "), daemon=True
+    )
     t_out.start()
     t_err.start()
 
@@ -82,13 +87,17 @@ def run_with_live_output(
 
         except queue.Empty:
             if process.poll() is not None:
-                remaining_timeout = timeout - (time.time() - start_time) if timeout else None
+                remaining_timeout = (
+                    timeout - (time.time() - start_time) if timeout else None
+                )
                 if remaining_timeout and remaining_timeout <= 0:
                     break
                 continue
 
             if timeout is not None and (time.time() - start_time) > timeout:
-                app_instance.append_log(f"[TIMEOUT] 命令执行超时 ({timeout}s)，正在终止...\n")
+                app_instance.append_log(
+                    f"[TIMEOUT] 命令执行超时 ({timeout}s)，正在终止...\n"
+                )
                 process.terminate()
                 try:
                     process.wait(timeout=5)
@@ -103,8 +112,11 @@ def run_with_live_output(
     t_err.join()
 
     returncode = process.wait()
-    app_instance.append_log(f"[Result] Command execution completed,  code：{returncode}\n")
+    app_instance.append_log(
+        f"[Result] Command execution completed,  code：{returncode}\n"
+    )
     return returncode
+
 
 def safe_remove(app_instance, file_path: str, retries: int = 3) -> bool:
     for i in range(retries):
@@ -114,15 +126,19 @@ def safe_remove(app_instance, file_path: str, retries: int = 3) -> bool:
                 app_instance.append_log(f"[OK] Temporary file has been deleted")
                 return True
         except PermissionError:
-            app_instance.append_log(f"[Warn] File is occupied, wait 0.5 seconds and try again... ({i + 1}/{retries})\n")
+            app_instance.append_log(
+                f"[Warn] File is occupied, wait 0.5 seconds and try again... ({i + 1}/{retries})\n"
+            )
             time.sleep(0.5)
         except Exception as e:
             app_instance.append_log(f"[Error] Failed to delete file：{e}\n")
             return False
     return False
 
+
 def get_version_info(yml_path: Path):
     from .utils import load_yml
+
     data = load_yml(yml_path)
     if data:
         version_info = data.get("versionInfo", {})
