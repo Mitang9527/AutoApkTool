@@ -1,0 +1,2 @@
+customtkinter==5.2.2
+ruamel.yaml==0.18.6
