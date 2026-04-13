@@ -268,4 +268,5 @@ def update_version_info(yml_path: Path, log_callback=None) -> None:
     with open(yml_path, "w", encoding="utf-8") as f:
         yaml.dump(data, f)
 
-    if log_callback: log_callback(f"[Version]update successful：{old_name}->{new_name}, Code: {old_code}->{new_code}\n")
+    if log_callback:
+        log_callback(f"[Version]update successful：{old_name}->{new_name}, Code: {old_code}->{new_code}\n")

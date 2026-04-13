@@ -437,7 +437,8 @@ class App(ctk.CTk):
                     with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
                         slclient_data = json.load(f)
                     current_login_mode_key = slclient_data.get("profile", {}).get("login_mode", "account")
-                except: pass
+                except:
+                    pass
             new_display_name = LOGIN_TYPE_MAPPING.get(current_login_mode_key, {}).get(i18n.current_lang, "Account Login")
             self.opt_login_type.set(new_display_name)
 
@@ -455,7 +456,8 @@ class App(ctk.CTk):
                         current_map_source_key = "baidu_oversea"
                     elif map_coor == "bd09ll" and current_map_source_key == "baidu":
                         current_map_source_key = "baidu_domestic"
-                except: pass
+                except:
+                    pass
             new_display_name = MAP_CONFIG_TEMPLATES.get(current_map_source_key, {}).get("display_name", {}).get(i18n.current_lang)
             self.opt_map_source.set(new_display_name)
         self._is_updating_language = False
@@ -897,11 +899,14 @@ class App(ctk.CTk):
         self.build_apk_btn.configure(state="disabled")
         def task():
             try:
-                if not self.apply_selected_config_to_slclient(): return False
+                if not self.apply_selected_config_to_slclient():
+                    return False
                 model = self.ask_model_dialog()
-                if model is None: raise Exception("User cancels packaging")
+                if model is None:
+                    raise Exception("User cancels packaging")
                 self.current_device_model = model
-                if model: set_json_field(PATH_SLCLIENT_JSON, ["device", "name"], model)
+                if model:
+                    set_json_field(PATH_SLCLIENT_JSON, ["device", "name"], model)
                 if not self.is_import: shutil.copy2(PATH_INPUT_JSON_SRC, PATH_INPUT_JSON_DST)
                 if run_with_live_output(self, ["java", "-jar", str(APKTOOL_JAR), "b", TEMP_DIR, "-o", "app-unsigned-unaligned.apk"]) != 0: raise Exception("APK packaging failed")
                 if run_with_live_output(self, [str(ZIPALIGN_EXE), "-v", "-p", "4", "app-unsigned-unaligned.apk", "app-unsigned.apk"]) != 0: raise Exception("APK alignment failed")
@@ -929,13 +934,204 @@ class App(ctk.CTk):
             return f"{prefix}{new_version_name}.apk"
         except: return f"APP_test_{datetime.now().strftime('%Y%m%d%H%M%S')}.apk"
 
+    def _get_slclient_preview_data(self) -> dict:
+        """
+        收集所有模块的当前配置值。
+        不依赖 build_config，直接从 GUI 控件读取以确保是最新值。
+        """
+        data = {}
+        current_lang = i18n.current_lang
+
+        # --- A. Profile (环境与登录) ---
+        # 1. 环境
+        selected_env_display = self.opt_env.get() if hasattr(self, 'opt_env') else "海外环境"
+        env_key = "overseas"
+        # 反查环境键名
+        for key, names in ENV_DISPLAY_NAMES.items():
+            if names.get(current_lang) == selected_env_display:
+                env_key = key
+                break
+
+        if PATH_SLCLIENT_JSON.exists():
+            try:
+                with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
+                    slclient_data = json.load(f)
+
+                profile_data = slclient_data.get("profile", {})
+                data["env_ip"] = profile_data.get("dns", "Default")
+                data["context"] = profile_data.get("context", "pocstar")
+                data["login_type"] = profile_data.get("login_type", self.opt_login_type.get() if hasattr(self, 'opt_login_type') else "account")
+            except Exception as e:
+                print(f"Error reading slclient.json: {e}")
+                data["env_ip"] = "Default"
+                data["context"] = "pocstar"
+                data["login_type"] = self.opt_login_type.get() if hasattr(self, 'opt_login_type') else "account"
+        else:
+            data["env_ip"] = "Default"
+            data["context"] = "pocstar"
+            data["login_type"] = self.opt_login_type.get() if hasattr(self, 'opt_login_type') else "account"
+
+        # --- B. LBS (地图) ---
+        data["map_source"] = self.opt_map_source.get() if hasattr(self, 'opt_map_source') else "Google"
+
+        # --- C. Sound & DSP ---
+        data["codec"] = self.opt_codec.get() if hasattr(self, 'opt_codec') else "amrnb"
+        data["tone_enabled"] = self.switch_tone_sfx.get() if hasattr(self, 'switch_tone_sfx') else True
+        data["audio_provider"] = self.opt_audio.get() if hasattr(self, 'opt_audio') else "default"
+        data["play_channel"] = self.opt_play.get() if hasattr(self, 'opt_play') else "music"
+        data["rec_channel"] = self.opt_rec.get() if hasattr(self, 'opt_rec') else "recognition"
+
+        # --- D. TTS & Launcher ---
+        data["tts_enabled"] = self.switch_sfx.get() if hasattr(self, 'switch_sfx') else False
+        data["launcher_home"] = self.switch_launcher.get() if hasattr(self, 'switch_launcher') else False
+
+        return data
+
     def apply_selected_config_to_slclient(self) -> bool:
-        # Simplified for brevity, similar to the original logic
-        # 1. Gather data from UI
-        # 2. Show confirmation dialog
-        # 3. Return user choice
-        # Implementation omitted for now to save space, but it's part of the modularization
-        return True # Placeholder
+        """
+        打包时调用：弹窗确认当前 slclient 的内容。
+        格式：键：值 (非 JSON)
+
+        Returns:
+            bool: True 表示用户确认，False 表示取消。
+        """
+        # 1. 获取数据
+        raw_data = self._get_slclient_preview_data()
+
+        lines = []
+
+        # 环境信息
+        ip_addresses = raw_data['env_ip']
+        if isinstance(ip_addresses, list):
+            ip_formatted = "\n".join([f"  - {ip}" for ip in ip_addresses])
+        else:
+            ips = str(ip_addresses).split(',')
+            ip_formatted = "\n".join([f"  - {ip.strip()}" for ip in ips])
+
+        lines.append("-" * 30)
+
+        # 检查IP地址是否在预定义环境中
+        found_env = None
+        for env_id, env_config in ENV_CONF.items():
+            env_ip_address = env_config.get("ip_address", "")
+            if isinstance(env_ip_address, list):
+                env_ips = env_ip_address
+            else:
+                env_ips = [addr.strip() for addr in str(env_ip_address).split(',')]
+
+            current_ips = [addr.strip() for addr in str(raw_data['env_ip']).split(',')] if not isinstance(
+                raw_data['env_ip'], list) else raw_data['env_ip']
+
+            if any(ip in env_ips for ip in current_ips):
+                found_env = env_id
+                break
+
+        if found_env:
+            lines.append(f"IP:  \n{ip_formatted}")
+            lines.append(f"Context:  {raw_data['context']}")
+        else:
+            lines.append(f"IP:  \n{ip_formatted}")
+            lines.append(f"Context:  {raw_data['context']}")
+
+        lbl_login_type = _("lbl_login_type")
+        lines.append(f"{lbl_login_type}:  {raw_data['login_type']}\n")
+        lines.append("-" * 30)
+
+        # 地图
+        lbl_map_source = _("lbl_map_source")
+        lines.append(f"{lbl_map_source}:  {raw_data['map_source']}\n")
+        lines.append("-" * 30)
+
+        # 声音
+        lines.append(f"Tone:  {'True' if raw_data['tone_enabled'] else 'False'}\n")
+        lines.append("-" * 30)
+        lines.append(f"Codec:  {raw_data['codec']}")
+        lines.append(f"audio:  {raw_data['audio_provider']}")
+        lines.append(f"Play channel:  {raw_data['play_channel']}")
+        lines.append(f"Rec channel:  {raw_data['rec_channel']}\n")
+        lines.append("-" * 30)
+
+        # 其他
+        lines.append(f"TTS:  {'True' if raw_data['tts_enabled'] else 'False'}")
+        lines.append(f"Launcher:  {'True' if raw_data['launcher_home'] else 'False'}")
+
+        # 拼接最终文本
+        message_text = "\n".join(lines)
+
+        # 3. 创建弹窗
+        win = ctk.CTkToplevel(self)
+        win.title(_("confirm_config_text"))
+        win.geometry("400x550")
+        win.resizable(True, True)
+
+        win.attributes("-topmost", True)
+        win.grab_set()
+
+        # ===== 字体统一 =====
+        title_font = ctk.CTkFont(size=15, weight="bold")
+        text_font = ctk.CTkFont(size=13)
+
+        # ===== 标题 =====
+        package_config_title = ctk.CTkLabel(win, text=_("package_config_title"), font=title_font)
+        package_config_title.pack(pady=(15, 5))
+
+        # ===== 内容 (使用 Textbox 显示文本行) =====
+        text_frame = ctk.CTkFrame(win, fg_color="transparent")
+        text_frame.pack(padx=20, pady=10, fill="both", expand=True)
+
+        textbox = ctk.CTkTextbox(text_frame, font=text_font, wrap="word")  # wrap="word" 自动换行
+        textbox.pack(fill="both", expand=True)
+        textbox.insert("0.0", message_text)
+        textbox.configure(state="disabled")  # 只读
+
+        # ===== 按钮 =====
+        btn_frame = ctk.CTkFrame(win, fg_color="transparent")
+        btn_frame.pack(pady=10)
+
+        result = {"confirmed": False}
+
+        def on_ok():
+            result["confirmed"] = True
+            win.destroy()
+
+        def on_cancel():
+            result["confirmed"] = False
+            win.destroy()
+
+        # 取消按钮
+        self.btn_dialog_cancel = ctk.CTkButton(
+            btn_frame,
+            text=_("cancel_button"),
+            font=text_font,
+            width=100,
+            command=on_cancel,
+            fg_color="gray"
+        )
+        self.btn_dialog_cancel.pack(side="left", padx=20)
+
+        # 确认按钮
+        self.btn_dialog_ok = ctk.CTkButton(
+            btn_frame,
+            text=_("confirm_button"),
+            font=text_font,
+            width=100,
+            command=on_ok,
+            fg_color="green"
+        )
+        self.btn_dialog_ok.pack(side="left", padx=20)
+
+        win.lift()
+        win.focus_force()
+        win.after(10, lambda: win.attributes("-topmost", False))
+
+        # 绑定按键
+        win.bind("<Return>", lambda e: on_ok())
+        win.bind("<Escape>", lambda e: on_cancel())
+
+        # 4. 阻塞等待
+        win.wait_window()
+
+        return result.get("confirmed", False)
 
     def load_and_echo_config_after_unzip(self):
         config_data = load_slclient_json()
