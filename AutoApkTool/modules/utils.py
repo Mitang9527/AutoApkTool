@@ -285,6 +285,61 @@ def copy_terminal_configs_from_folder(source_dir: Path) -> None:
     )
 
 
+def get_formatted_key_configs(data: dict) -> list:
+    """
+    解析 JSON 数据并返回格式化后的按键配置列表，供 UI 渲染
+    返回列表元素格式：(name, event_str, key_val, action_str, cmd_str)
+    按 key_val 升序排列
+    """
+    intents = data.get("intent", {})
+    stdkeys = data.get("stdkey", {})
+    actions_data = data.get("action", {})
+
+    valid_names = set(stdkeys.keys()) & set(intents.keys())
+    sortable_items = []
+
+    for name in valid_names:
+        sk = stdkeys.get(name, {})
+        key_val = sk.get("key")
+        sortable_items.append(
+            (name, key_val if isinstance(key_val, int) else float("inf"))
+        )
+
+    sortable_items.sort(key=lambda x: x[1], reverse=False)
+
+    formatted_items = []
+    for name, _ in sortable_items:
+        sk = stdkeys.get(name, {})
+        ac = actions_data.get(name, {})
+        info = intents.get(name, {})
+
+        event_str = sk.get("event", i18n.get("msg_not_available"))
+        key_val = sk.get("key", i18n.get("msg_not_available"))
+        action_str = info.get("action", i18n.get("msg_default_placeholder"))
+        cmds = ac.get("default", [])
+        
+        cmd_str = (
+            ", ".join(
+                filter(
+                    None,
+                    [
+                        c.get("command", {}).get("id", "")
+                        for c in cmds
+                        if isinstance(c, dict)
+                    ],
+                )
+            )
+            if isinstance(cmds, list)
+            else i18n.get("msg_default_placeholder")
+        )
+        if not cmd_str:
+            cmd_str = i18n.get("msg_default_placeholder")
+
+        formatted_items.append((name, event_str, key_val, action_str, cmd_str))
+
+    return formatted_items
+
+
 def save_manual_keys_to_json(val_press: str, val_release: str, val_sos: str) -> Optional[Dict]:
     """
     将手动输入的 PTT 和 SOS 按键写入 backend 的 input.json/reaction.json 中

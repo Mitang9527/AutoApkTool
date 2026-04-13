@@ -660,9 +660,7 @@ class App(ctk.CTk):
                         data = json.load(f)
                 except:
                     pass
-            intents = data.get("intent", {})
-            stdkeys = data.get("stdkey", {})
-            actions_data = data.get("action", {})
+            
             headers = [
                 i18n.get("msg_header_key_name"),
                 i18n.get("msg_header_event"),
@@ -677,44 +675,14 @@ class App(ctk.CTk):
                     font=ctk.CTkFont(weight="bold", size=13),
                     anchor="w",
                 ).grid(row=0, column=i, padx=15, pady=15, sticky="w")
-            valid_names = set(stdkeys.keys()) & set(intents.keys())
-            sortable_items = []
-            for name in valid_names:
-                sk = stdkeys.get(name, {})
-                key_val = sk.get("key")
-                sortable_items.append(
-                    (name, key_val if isinstance(key_val, int) else float("inf"))
-                )
-            sortable_items.sort(key=lambda x: x[1], reverse=False)
+            
+            formatted_items = get_formatted_key_configs(data)
             row_idx = 1
-            for name, _ in sortable_items:
+            
+            for name, event_str, key_val, action_str, cmd_str in formatted_items:
                 if not self.winfo_exists():
                     return
-                sk, ac, info = (
-                    stdkeys.get(name, {}),
-                    actions_data.get(name, {}),
-                    intents.get(name, {}),
-                )
-                event_str = sk.get("event", i18n.get("msg_not_available"))
-                key_val = sk.get("key", i18n.get("msg_not_available"))
-                action_str = info.get("action", i18n.get("msg_default_placeholder"))
-                cmds = ac.get("default", [])
-                cmd_str = (
-                    ", ".join(
-                        filter(
-                            None,
-                            [
-                                c.get("command", {}).get("id", "")
-                                for c in cmds
-                                if isinstance(c, dict)
-                            ],
-                        )
-                    )
-                    if isinstance(cmds, list)
-                    else i18n.get("msg_default_placeholder")
-                )
-                if not cmd_str:
-                    cmd_str = i18n.get("msg_default_placeholder")
+                
                 ctk.CTkLabel(
                     self.scroll_frame,
                     text=name,
