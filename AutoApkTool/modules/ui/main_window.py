@@ -826,17 +826,7 @@ class App(ctk.CTk):
     def copy_terminal_files(self, folder_path):
         source_dir = Path(folder_path)
         try:
-            shutil.copy2(source_dir / "slclient.json", PATH_ASS / "slclient.json")
-            shutil.copy2(
-                source_dir / "slclient" / "led.json", PATH_SLCLIENT / "led.json"
-            )
-            shutil.copy2(
-                source_dir / "slclient" / "input.json", PATH_SLCLIENT / "input.json"
-            )
-            shutil.copy2(
-                source_dir / "slclient" / "reaction.json",
-                PATH_SLCLIENT / "reaction.json",
-            )
+            copy_terminal_configs_from_folder(source_dir)
             self.append_log(f"[success] Imported {folder_path.name} Successfully\n")
             self.show_custom_message(
                 "Success", f"Imported \n\n{folder_path.name}\n\nSuccessfully !"
@@ -866,89 +856,24 @@ class App(ctk.CTk):
             )
             return
         try:
-            timestamp_suffix = datetime.now().strftime("%Y%m%d%H%M%S")
-            existing_codes = set()
-            if os.path.exists(JSON_FILE):
-                try:
-                    with open(JSON_FILE, "r", encoding="utf-8") as f:
-                        temp_data = json.load(f)
-                        for v in temp_data.get("stdkey", {}).values():
-                            if isinstance(v.get("key"), int):
-                                existing_codes.add(v["key"])
-                except:
-                    pass
-            new_vkey_ptt = None
-            if has_ptt:
-                new_vkey_ptt = -1000
-                while new_vkey_ptt in existing_codes:
-                    new_vkey_ptt -= 1
-                existing_codes.add(new_vkey_ptt)
-            new_vkey_sos = None
-            if has_sos:
-                new_vkey_sos = -1000
-                while new_vkey_sos in existing_codes:
-                    new_vkey_sos -= 1
-            new_entries = {"stdkey": {}, "action": {}, "intent": {}}
-            if has_ptt:
-                name_ptt_down, name_ptt_up = (
-                    f"many_ptt_down_{timestamp_suffix}",
-                    f"ptt_up_{timestamp_suffix}",
-                )
-                (
-                    new_entries["stdkey"][name_ptt_down],
-                    new_entries["stdkey"][name_ptt_up],
-                ) = {"event": "KEY_DOWN", "key": new_vkey_ptt}, {
-                    "event": "KEY_UP",
-                    "key": new_vkey_ptt,
-                }
-                (
-                    new_entries["action"][name_ptt_down],
-                    new_entries["action"][name_ptt_up],
-                ) = {"default": [], "member": [], "new_call_in": []}, {
-                    "default": [{"command": {"id": "STOP_SPEAK"}}],
-                    "member": [],
-                    "new_call_in": [],
-                }
-                (
-                    new_entries["intent"][name_ptt_down],
-                    new_entries["intent"][name_ptt_up],
-                ) = {"action": val_press}, {"action": val_release}
-            if has_sos:
-                name_sos_down, name_sos_up = (
-                    f"sos_down_{timestamp_suffix}",
-                    f"sos_up_{timestamp_suffix}",
-                )
-                new_entries["stdkey"][name_sos_down] = new_entries["stdkey"][
-                    name_sos_up
-                ] = {"event": "KEY_CLICK", "key": new_vkey_sos, "time": 3000}
-                new_entries["intent"][name_sos_down] = new_entries["intent"][
-                    name_sos_up
-                ] = {"action": val_sos}
-            data = {"stdkey": {}, "action": {}, "intent": {}, "custom": []}
-            if os.path.exists(JSON_FILE):
-                try:
-                    with open(JSON_FILE, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                except:
-                    pass
-            for k in ["stdkey", "action", "intent"]:
-                data.setdefault(k, {}).update(new_entries[k])
-            with open(JSON_FILE, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-            if has_ptt:
-                self.entry_ptt_press.delete(0, "end")
-                self.entry_ptt_release.delete(0, "end")
-            if has_sos:
-                self.entry_sos.delete(0, "end")
-            msg_lines = ["✅ Configuration is saved"]
-            if has_ptt:
-                msg_lines.append(f"   🟢 PTT Key: {new_vkey_ptt}")
-            if has_sos:
-                msg_lines.append(f"   🔴 SOS Key: {new_vkey_sos}")
-            final_msg = "\n".join(msg_lines)
-            self.append_log(f"[Manual Save] {final_msg}\n")
-            self.show_custom_message("Successfully", final_msg)
-            self._safe_refresh_config_view()
+            result = save_manual_keys_to_json(val_press, val_release, val_sos)
+            if result:
+                if has_ptt:
+                    self.entry_ptt_press.delete(0, "end")
+                    self.entry_ptt_release.delete(0, "end")
+                if has_sos:
+                    self.entry_sos.delete(0, "end")
+                
+                msg_lines = ["✅ Configuration is saved"]
+                if has_ptt:
+                    msg_lines.append(f"   🟢 PTT Key: {result['ptt_key']}")
+                if has_sos:
+                    msg_lines.append(f"   🔴 SOS Key: {result['sos_key']}")
+                final_msg = "\n".join(msg_lines)
+                
+                self.append_log(f"[Manual Save] {final_msg}\n")
+                self.show_custom_message("Successfully", final_msg)
+                self._safe_refresh_config_view()
         except Exception as e:
             self.append_log(f"[Error] _on_save_manual_keys: {e}\n")
             messagebox.showerror("ERROR", f"❌ ERROR：{str(e)}")

@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import List, Any, Optional, Dict
 from tkinter import messagebox
 from ruamel.yaml import YAML
+from datetime import datetime
 from .constants import (
     PATH_SLCLIENT_JSON,
     LOGIN_TYPE_MAPPING,
@@ -18,6 +19,9 @@ from .constants import (
     LBS_MAP_PYPE,
     ANDROID_NAMESPACE,
     PATH_MANIFEST_XML,
+    PATH_ASS,
+    PATH_SLCLIENT,
+    JSON_FILE,
 )
 from .i18n import i18n, _
 
@@ -266,6 +270,112 @@ def slclient_set_tts_enabled(is_enabled: bool) -> bool:
         return save_slclient_json(data, indent=4)
     except Exception:
         return False
+
+
+def copy_terminal_configs_from_folder(source_dir: Path) -> None:
+    """
+    从指定终端配置文件夹导入配置到打包目录
+    """
+    shutil.copy2(source_dir / "slclient.json", PATH_ASS / "slclient.json")
+    shutil.copy2(source_dir / "slclient" / "led.json", PATH_SLCLIENT / "led.json")
+    shutil.copy2(source_dir / "slclient" / "input.json", PATH_SLCLIENT / "input.json")
+    shutil.copy2(
+        source_dir / "slclient" / "reaction.json",
+        PATH_SLCLIENT / "reaction.json",
+    )
+
+
+def save_manual_keys_to_json(val_press: str, val_release: str, val_sos: str) -> Optional[Dict]:
+    """
+    将手动输入的 PTT 和 SOS 按键写入 backend 的 input.json/reaction.json 中
+    （实际写入到 JSON_FILE）
+    返回包含新分配 key 值的字典，如果失败或无内容则返回 None
+    """
+    has_ptt, has_sos = bool(val_press and val_release), bool(val_sos)
+    if not has_ptt and not has_sos:
+        return None
+
+    timestamp_suffix = datetime.now().strftime("%Y%m%d%H%M%S")
+    existing_codes = set()
+    if os.path.exists(JSON_FILE):
+        try:
+            with open(JSON_FILE, "r", encoding="utf-8") as f:
+                temp_data = json.load(f)
+                for v in temp_data.get("stdkey", {}).values():
+                    if isinstance(v.get("key"), int):
+                        existing_codes.add(v["key"])
+        except Exception:
+            pass
+
+    new_vkey_ptt = None
+    if has_ptt:
+        new_vkey_ptt = -1000
+        while new_vkey_ptt in existing_codes:
+            new_vkey_ptt -= 1
+        existing_codes.add(new_vkey_ptt)
+
+    new_vkey_sos = None
+    if has_sos:
+        new_vkey_sos = -1000
+        while new_vkey_sos in existing_codes:
+            new_vkey_sos -= 1
+
+    new_entries = {"stdkey": {}, "action": {}, "intent": {}}
+    if has_ptt:
+        name_ptt_down, name_ptt_up = (
+            f"many_ptt_down_{timestamp_suffix}",
+            f"ptt_up_{timestamp_suffix}",
+        )
+        (
+            new_entries["stdkey"][name_ptt_down],
+            new_entries["stdkey"][name_ptt_up],
+        ) = {"event": "KEY_DOWN", "key": new_vkey_ptt}, {
+            "event": "KEY_UP",
+            "key": new_vkey_ptt,
+        }
+        (
+            new_entries["action"][name_ptt_down],
+            new_entries["action"][name_ptt_up],
+        ) = {"default": [], "member": [], "new_call_in": []}, {
+            "default": [{"command": {"id": "STOP_SPEAK"}}],
+            "member": [],
+            "new_call_in": [],
+        }
+        (
+            new_entries["intent"][name_ptt_down],
+            new_entries["intent"][name_ptt_up],
+        ) = {"action": val_press}, {"action": val_release}
+
+    if has_sos:
+        name_sos_down, name_sos_up = (
+            f"sos_down_{timestamp_suffix}",
+            f"sos_up_{timestamp_suffix}",
+        )
+        new_entries["stdkey"][name_sos_down] = new_entries["stdkey"][
+            name_sos_up
+        ] = {"event": "KEY_CLICK", "key": new_vkey_sos, "time": 3000}
+        new_entries["intent"][name_sos_down] = new_entries["intent"][
+            name_sos_up
+        ] = {"action": val_sos}
+
+    data = {"stdkey": {}, "action": {}, "intent": {}, "custom": []}
+    if os.path.exists(JSON_FILE):
+        try:
+            with open(JSON_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            pass
+
+    for k in ["stdkey", "action", "intent"]:
+        data.setdefault(k, {}).update(new_entries[k])
+
+    with open(JSON_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    return {
+        "ptt_key": new_vkey_ptt,
+        "sos_key": new_vkey_sos
+    }
 
 
 # ==================== Manifest 辅助函数 ====================
