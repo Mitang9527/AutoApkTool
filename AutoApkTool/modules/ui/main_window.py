@@ -458,10 +458,13 @@ class App(ctk.CTk):
 
     def update_option_menus_on_language_change(self):
         self._is_updating_language = True
+        
+        # 批量获取翻译结果以减少函数调用开销
+        current_lang = i18n.current_lang
+        
         if hasattr(self, "opt_login_type"):
             login_type_display_names = [
-                LOGIN_TYPE_MAPPING[key][i18n.current_lang]
-                for key in LOGIN_TYPE_MAPPING.keys()
+                v[current_lang] for v in LOGIN_TYPE_MAPPING.values()
             ]
             self.opt_login_type.configure(values=login_type_display_names)
             current_login_mode_key = "account"
@@ -475,13 +478,13 @@ class App(ctk.CTk):
                 except:
                     pass
             new_display_name = LOGIN_TYPE_MAPPING.get(current_login_mode_key, {}).get(
-                i18n.current_lang, "Account Login"
+                current_lang, "Account Login"
             )
             self.opt_login_type.set(new_display_name)
 
         if hasattr(self, "opt_map_source"):
             map_source_display_names = [
-                v["display_name"][i18n.current_lang]
+                v["display_name"][current_lang]
                 for v in MAP_CONFIG_TEMPLATES.values()
             ]
             self.opt_map_source.configure(values=map_source_display_names)
@@ -503,7 +506,7 @@ class App(ctk.CTk):
             new_display_name = (
                 MAP_CONFIG_TEMPLATES.get(current_map_source_key, {})
                 .get("display_name", {})
-                .get(i18n.current_lang)
+                .get(current_lang)
             )
             self.opt_map_source.set(new_display_name)
         self._is_updating_language = False
