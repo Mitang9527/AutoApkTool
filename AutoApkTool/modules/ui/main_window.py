@@ -458,10 +458,9 @@ class App(ctk.CTk):
 
     def update_option_menus_on_language_change(self):
         self._is_updating_language = True
-        
-        # 批量获取翻译结果以减少函数调用开销
+
         current_lang = i18n.current_lang
-        
+
         if hasattr(self, "opt_login_type"):
             login_type_display_names = [
                 v[current_lang] for v in LOGIN_TYPE_MAPPING.values()
@@ -967,14 +966,11 @@ class App(ctk.CTk):
             messagebox.showwarning("Error", "IP and Context must be entered！")
             return
         try:
-            with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            profile = data.setdefault("profile", {})
-            profile["context"], profile["dns"] = new_context, [new_ip]
-            if upgrade_url:
-                profile["upgrade_url"] = upgrade_url
-            with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
+            update_slclient_profile(
+                dns=[new_ip],
+                context=new_context,
+                upgrade_url=upgrade_url if upgrade_url else None,
+            )
             self.show_custom_message("Successfully", "saved successfully")
         except Exception as e:
             messagebox.showerror("Error", f"❌ 保存失败: {str(e)}")
@@ -983,68 +979,48 @@ class App(ctk.CTk):
         if not PATH_SLCLIENT_JSON.exists():
             return
         try:
-            data = load_slclient_json()
-            if data.get("sound", {}).get("codec") != selected_codec:
-                data.setdefault("sound", {})["codec"] = selected_codec
-                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
+            if slclient_set_sound_codec(selected_codec):
                 self.append_log(f"[OK] Voice coding switched.: {selected_codec}\n")
-        except:
+        except Exception:
             pass
 
     def _sync_soundsystem_to_json(self, selected_codec: str) -> None:
         if not PATH_SLCLIENT_JSON.exists():
             return
         try:
-            data = load_slclient_json()
-            if data.get("dsp", {}).get("provider") != selected_codec:
-                data.setdefault("dsp", {})["provider"] = selected_codec
-                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
+            if slclient_set_dsp_provider(selected_codec):
                 self.append_log(f"[OK] The audio system  switched.: {selected_codec}\n")
-        except:
+        except Exception:
             pass
 
     def _sync_play_to_json(self, selected_codec: str) -> None:
         if not PATH_SLCLIENT_JSON.exists():
             return
         try:
-            data = load_slclient_json()
-            if data.get("dsp", {}).get("play_stream") != selected_codec:
-                data.setdefault("dsp", {})["play_stream"] = selected_codec
-                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
+            if slclient_set_play_stream(selected_codec):
                 self.append_log(f"[OK] Playback channel switched: {selected_codec}\n")
-        except:
+        except Exception:
             pass
 
     def _sync_record_to_json(self, selected_codec: str) -> None:
         if not PATH_SLCLIENT_JSON.exists():
             return
         try:
-            data = load_slclient_json()
-            if data.get("dsp", {}).get("record_stream") != selected_codec:
-                data.setdefault("dsp", {})["record_stream"] = selected_codec
-                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
+            if slclient_set_record_stream(selected_codec):
                 self.append_log(f"[OK] Recording channels switched: {selected_codec}\n")
-        except:
+        except Exception:
             pass
 
     def _sync_tone_enabled_to_json(self, is_enabled: bool) -> None:
         if not PATH_SLCLIENT_JSON.exists():
             return
         try:
-            data = load_slclient_json()
             json_value = bool(is_enabled)
-            if data.get("sound", {}).get("tone_enabled") != json_value:
-                data.setdefault("sound", {})["tone_enabled"] = json_value
-                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
+            if slclient_set_tone_enabled(json_value):
                 self.append_log(
                     f"[OK] Tone sound effects have been {'开启' if json_value else '关闭'}\n"
                 )
-        except:
+        except Exception:
             pass
 
     def on_map_source_change(self, selected_display_name: str) -> None:
@@ -1075,14 +1051,10 @@ class App(ctk.CTk):
         if not PATH_SLCLIENT_JSON.exists():
             return
         try:
-            data = load_slclient_json()
             json_value = bool(is_enabled)
-            if data.get("tts", {}).get("enabled") != json_value:
-                data.setdefault("tts", {})["enabled"] = json_value
-                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
+            if slclient_set_tts_enabled(json_value):
                 self.append_log(f"[OK] tts {'开启' if json_value else '关闭'}\n")
-        except:
+        except Exception:
             pass
 
     def _on_env_selected(self, selected_name):
@@ -1105,16 +1077,13 @@ class App(ctk.CTk):
             if not ip_address or not context or not upgrade_url:
                 return
             try:
-                data = load_slclient_json()
-                profile = data.setdefault("profile", {})
-                profile["dns"], profile["context"], profile["upgrade_url"] = (
-                    ip_address.split(","),
-                    context,
-                    upgrade_url,
+                update_slclient_profile(
+                    dns=ip_address.split(","),
+                    context=context,
+                    upgrade_url=upgrade_url,
+                    env_key=selected_key,
                 )
-                with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
-            except:
+            except Exception:
                 pass
 
     def _update_preview(self, key, value):

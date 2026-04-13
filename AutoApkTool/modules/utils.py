@@ -154,6 +154,120 @@ def load_slclient_json() -> dict:
     return data
 
 
+def save_slclient_json(data: dict, *, indent: int = 4) -> bool:
+    if not PATH_SLCLIENT_JSON.exists():
+        return False
+    try:
+        with open(PATH_SLCLIENT_JSON, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=indent, ensure_ascii=False)
+        return True
+    except Exception:
+        return False
+
+
+def update_slclient_profile(
+    *,
+    dns: List[str],
+    context: str,
+    upgrade_url: Optional[str] = None,
+    env_key: Optional[str] = None,
+) -> bool:
+    if not PATH_SLCLIENT_JSON.exists():
+        return False
+    try:
+        data = load_slclient_json()
+        profile = data.setdefault("profile", {})
+        profile["dns"] = dns
+        profile["context"] = context
+        if upgrade_url is not None:
+            profile["upgrade_url"] = upgrade_url
+        if env_key is not None:
+            profile["env_key"] = env_key
+        return save_slclient_json(data, indent=4)
+    except Exception:
+        return False
+
+
+def slclient_set_sound_codec(codec: str) -> bool:
+    if not PATH_SLCLIENT_JSON.exists():
+        return False
+    try:
+        data = load_slclient_json()
+        if data.get("sound", {}).get("codec") == codec:
+            return True
+        data.setdefault("sound", {})["codec"] = codec
+        return save_slclient_json(data, indent=4)
+    except Exception:
+        return False
+
+
+def slclient_set_dsp_provider(provider: str) -> bool:
+    if not PATH_SLCLIENT_JSON.exists():
+        return False
+    try:
+        data = load_slclient_json()
+        if data.get("dsp", {}).get("provider") == provider:
+            return True
+        data.setdefault("dsp", {})["provider"] = provider
+        return save_slclient_json(data, indent=4)
+    except Exception:
+        return False
+
+
+def slclient_set_play_stream(play_stream: str) -> bool:
+    if not PATH_SLCLIENT_JSON.exists():
+        return False
+    try:
+        data = load_slclient_json()
+        if data.get("dsp", {}).get("play_stream") == play_stream:
+            return True
+        data.setdefault("dsp", {})["play_stream"] = play_stream
+        return save_slclient_json(data, indent=4)
+    except Exception:
+        return False
+
+
+def slclient_set_record_stream(record_stream: str) -> bool:
+    if not PATH_SLCLIENT_JSON.exists():
+        return False
+    try:
+        data = load_slclient_json()
+        if data.get("dsp", {}).get("record_stream") == record_stream:
+            return True
+        data.setdefault("dsp", {})["record_stream"] = record_stream
+        return save_slclient_json(data, indent=4)
+    except Exception:
+        return False
+
+
+def slclient_set_tone_enabled(is_enabled: bool) -> bool:
+    if not PATH_SLCLIENT_JSON.exists():
+        return False
+    try:
+        data = load_slclient_json()
+        json_value = bool(is_enabled)
+        if data.get("sound", {}).get("tone_enabled") == json_value:
+            return True
+        data.setdefault("sound", {})["tone_enabled"] = json_value
+        return save_slclient_json(data, indent=4)
+    except Exception:
+        return False
+
+
+def slclient_set_tts_enabled(is_enabled: bool) -> bool:
+    if not PATH_SLCLIENT_JSON.exists():
+        return False
+    try:
+        data = load_slclient_json()
+        json_value = bool(is_enabled)
+        if data.get("tts", {}).get("enabled") == json_value:
+            return True
+        data.setdefault("tts", {})["enabled"] = json_value
+        return save_slclient_json(data, indent=4)
+    except Exception:
+        return False
+
+
 # ==================== Manifest 辅助函数 ====================
 
 
