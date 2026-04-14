@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller
+#  Refer to https://pyinstaller.org/en/stable/usage.html#supporting-multiple-platforms
+*.spec
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Output
+app_out/
+202*_*/
+*.apk
+!LargeApp.apk
+!SmallApp.apk
+!Screenless.apk
