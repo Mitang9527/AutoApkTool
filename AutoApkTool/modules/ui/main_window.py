@@ -16,7 +16,35 @@ from typing import Optional, Set, List, Any, Dict
 import customtkinter as ctk
 from tkinter import messagebox, filedialog
 
-from ..constants import *
+from ..constants import (
+    RESOURCE_PATH,
+    WORKSPACE_PATH,
+    TEMP_PATH,
+    JSON_FILE,
+    APKTOOL_JAR,
+    APK_LARGE,
+    APK_SMALL,
+    APK_SCREENLESS,
+    ENV_CONF,
+    ENV_DISPLAY_NAMES,
+    LOGIN_TYPE_MAPPING,
+    MAP_CONFIG_TEMPLATES,
+    LAUNCHER_MODULE_PATH,
+    RECORDER_ENABLE_PATH,
+    PATH_SLCLIENT_JSON,
+    PATH_YML,
+    APKSIGNER_BAT,
+    KEYSTORE_CONFIG,
+    LBS_COOR_PATH,
+    LBS_MAP_PYPE,
+    ANDROID_NAMESPACE,
+    PATH_MANIFEST_XML,
+    PATH_ASS,
+    PATH_SLCLIENT,
+    PATH_INPUT_JSON_SRC,
+    PATH_INPUT_JSON_DST,
+    TEMP_DIR,
+)
 from ..i18n import i18n, _
 from ..env_checker import EnvChecker, is_adb_installed
 from ..backend import SmartKeyBackend
