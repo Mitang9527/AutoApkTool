@@ -13,7 +13,7 @@ a = Analysis(
         (os.path.join(spec_dir, "cert"), "cert"),
         (os.path.join(spec_dir, "win"), "win"),
         (os.path.join(spec_dir, "terminal_configs"), "terminal_configs"),
-        (os.path.join(spec_dir, "Env"), "Env"),
+#        (os.path.join(spec_dir, "Env"), "Env"),
         (os.path.join(spec_dir, "apktool.jar"), "."),
         (os.path.join(spec_dir, "LargeApp.apk"), "."),
         (os.path.join(spec_dir, "SmallApp.apk"), "."),

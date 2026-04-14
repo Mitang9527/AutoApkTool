@@ -34,6 +34,7 @@ from ..constants import (
     PATH_SLCLIENT_JSON,
     PATH_YML,
     APKSIGNER_BAT,
+    ZIPALIGN_EXE,
     KEYSTORE_CONFIG,
     LBS_COOR_PATH,
     LBS_MAP_PYPE,
