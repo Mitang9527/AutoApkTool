@@ -44,10 +44,10 @@ def run_with_live_output(
             encoding=encoding,
         )
     except FileNotFoundError:
-        app_instance.append_log(f"[ERROR] 找不到命令或文件: {command[0]}\n")
+        app_instance.append_log(f"[ERROR] Command or file not found: {command[0]}\n")
         return -1
     except Exception as e:
-        app_instance.append_log(f"[CRITICAL] 启动进程失败: {e}\n")
+        app_instance.append_log(f"[CRITICAL] Failed to start process: {e}\n")
         return -1
 
     log_queue = queue.Queue(maxsize=1000)
@@ -59,7 +59,7 @@ def run_with_live_output(
                     log_queue.put((prefix, line.rstrip("\n\r")))
             stream.close()
         except Exception as e:
-            app_instance.append_log(f"[ERROR] 读取子进程输出流时出错: {e}\n")
+            app_instance.append_log(f"[ERROR] Error reading subprocess output: {e}\n")
         finally:
             log_queue.put((None, None))
 
@@ -96,7 +96,7 @@ def run_with_live_output(
 
             if timeout is not None and (time.time() - start_time) > timeout:
                 app_instance.append_log(
-                    f"[TIMEOUT] 命令执行超时 ({timeout}s)，正在终止...\n"
+                    f"[TIMEOUT] Execution timeout ({timeout}s), terminating...\n"
                 )
                 process.terminate()
                 try:

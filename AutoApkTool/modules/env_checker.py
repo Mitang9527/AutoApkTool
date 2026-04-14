@@ -52,19 +52,19 @@ def is_java_installed() -> bool:
 
 def show_env_error_dialog(parent: ctk.CTk, missing_list: List[str]) -> None:
     """显示环境缺失的弹窗"""
-    msg = "System environment check failed：\n\n"
+    msg = "System environment check failed:\n\n"
     if "ADB" in missing_list:
         msg += (
             "❌ ADB (Android Debug Bridge)\n   "
             "Decompress and install ADB compressed package in Env\n"
-            ", and set system variables.。\n"
+            ", and set system variables.\n"
         )
     if "JAVA" in missing_list:
         msg += (
             "❌ Java (JDK/JRE)\n   "
             "Solution: extract the JDK compressed package in Env and install it.\n"
         )
-    msg += "\nPlease install the missing components and click [Retry Detection].。"
+    msg += "\nPlease install the missing components and click [Retry Detection]."
 
     dialog = ctk.CTkToplevel(parent)
     dialog.title("环境缺失警告")

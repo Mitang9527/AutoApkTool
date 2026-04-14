@@ -551,7 +551,7 @@ class App(ctk.CTk):
     def on_env_retry(self) -> None:
         self.append_log("\n[Info] Detecting environment...\n")
         if self.env_checker.check_all(show_dialog=False):
-            self.append_log("[OK] Environmental passed.！\n")
+            self.append_log("[OK] Environmental check passed!\n")
             self.start_btn.configure(state="normal")
             self.refresh_devices()
             self.after(100, self.refresh_config_view)
@@ -764,7 +764,7 @@ class App(ctk.CTk):
     def on_login_type_change(self, selected_val: str) -> None:
         self._update_preview("login_type", selected_val)
         if update_slclient_login_type(selected_val):
-            self.append_log(f"[OK] The login method  changed to:{selected_val}\n")
+            self.append_log(f"[OK] The login method changed to: {selected_val}\n")
         else:
             self.append_log(
                 f"[Error] Failed to update the login mode: {selected_val}\n"
@@ -772,7 +772,7 @@ class App(ctk.CTk):
 
     def on_apk_type_change(self, value: str) -> None:
         self.current_apk_type = value
-        self.append_log(f"[Info] APK type switched to：{value}\n")
+        self.append_log(f"[Info] APK type switched to: {value}\n")
 
     def show_custom_message(self, title, message):
         win = ctk.CTkToplevel(self)
@@ -828,12 +828,12 @@ class App(ctk.CTk):
         source_dir = Path(folder_path)
         try:
             copy_terminal_configs_from_folder(source_dir)
-            self.append_log(f"[success] Imported {folder_path.name} Successfully\n")
+            self.append_log(f"[Success] Imported {folder_path.name} successfully\n")
             self.show_custom_message(
-                "Success", f"Imported \n\n{folder_path.name}\n\nSuccessfully !"
+                "Success", f"Imported \n\n{folder_path.name}\n\nsuccessfully!"
             )
         except Exception as e:
-            self.append_log(f"[ERROR]: {e}")
+            self.append_log(f"[Error]: {e}\n")
 
     def _on_save_manual_keys(self):
         val_press, val_release, val_sos = (
@@ -906,7 +906,7 @@ class App(ctk.CTk):
             return
         try:
             if slclient_set_sound_codec(selected_codec):
-                self.append_log(f"[OK] Voice coding switched.: {selected_codec}\n")
+                self.append_log(f"[OK] Voice coding switched: {selected_codec}\n")
         except Exception:
             pass
 
@@ -915,7 +915,7 @@ class App(ctk.CTk):
             return
         try:
             if slclient_set_dsp_provider(selected_codec):
-                self.append_log(f"[OK] The audio system  switched.: {selected_codec}\n")
+                self.append_log(f"[OK] Audio system switched: {selected_codec}\n")
         except Exception:
             pass
 
@@ -944,7 +944,7 @@ class App(ctk.CTk):
             json_value = bool(is_enabled)
             if slclient_set_tone_enabled(json_value):
                 self.append_log(
-                    f"[OK] Tone sound effects have been {'开启' if json_value else '关闭'}\n"
+                    f"[OK] Tone sound effects have been {'Enabled' if json_value else 'Disabled'}\n"
                 )
         except Exception:
             pass
@@ -965,7 +965,7 @@ class App(ctk.CTk):
         if selected_key and update_slclient_map_type(selected_key):
             self._update_preview("map_source", selected_display_name)
             self.append_log(
-                f"[OK] Map source has been updated to：{selected_display_name}\n"
+                f"[OK] Map source has been updated to: {selected_display_name}\n"
             )
         else:
             messagebox.showwarning("警告", "配置更新失败或无效的地图源")
@@ -979,7 +979,7 @@ class App(ctk.CTk):
         try:
             json_value = bool(is_enabled)
             if slclient_set_tts_enabled(json_value):
-                self.append_log(f"[OK] tts {'开启' if json_value else '关闭'}\n")
+                self.append_log(f"[OK] TTS {'Enabled' if json_value else 'Disabled'}\n")
         except Exception:
             pass
 
@@ -1190,10 +1190,10 @@ class App(ctk.CTk):
                             )
                             shutil.copy2(json_src, PATH_INPUT_JSON_DST)
                             self.append_log(
-                                f"[Info] 同步配置文件: {json_src.name} -> {PATH_INPUT_JSON_DST}\n"
+                                f"[Info] Sync config file: {json_src.name} -> {PATH_INPUT_JSON_DST}\n"
                             )
                         except Exception as e:
-                            self.append_log(f"[Error] 同步 input.json 失败: {e}\n")
+                            self.append_log(f"[Error] Failed to sync input.json: {e}\n")
 
                 if (
                     run_with_live_output(

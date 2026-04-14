@@ -71,7 +71,7 @@ class SmartKeyBackend:
             return True
 
         except Exception as e:
-            self.log_callback(f"[Error] Failed to read configuration：{e}\n")
+            self.log_callback(f"[Error] Failed to read configuration: {e}\n")
             self.data = {
                 "stdkey": {},
                 "action": {},
@@ -93,7 +93,7 @@ class SmartKeyBackend:
                 )
             return True
         except Exception as e:
-            self.log_callback(f"[Error] save failed：{e}\n")
+            self.log_callback(f"[Error] Save failed: {e}\n")
             return False
 
     def _kill_process(self) -> None:
@@ -289,7 +289,7 @@ class SmartKeyBackend:
                     self.skip_count += 1
                     if self.skip_count % SKIP_FEEDBACK_INTERVAL == 0:
                         self.log_callback(
-                            f"[Skip] Action '{action_str}' already exists。\n"
+                            f"[Skip] Action '{action_str}' already exists.\n"
                         )
                     continue
 
@@ -327,7 +327,7 @@ class SmartKeyBackend:
                 )
 
                 if self.save_config(silent=True):
-                    self.log_callback("[Auto-Save] ✅ Success。\n")
+                    self.log_callback("[Auto-Save] ✅ Success.\n")
                     if self.config_callback:
                         self.config_callback()
                 self.log_callback("\n")
@@ -338,12 +338,12 @@ class SmartKeyBackend:
         finally:
             self._kill_process()
             self.is_running = False
-            self.log_callback("\n[Info] Monitoring has stopped。\n")
+            self.log_callback("\n[Info] Monitoring has stopped.\n")
 
     def start_capture(self, key_type: str) -> None:
         """启动监听线程"""
         if self.is_running:
-            self.log_callback("[Warning] Monitoring is already running。\n")
+            self.log_callback("[Warning] Monitoring is already running.\n")
             return
         self.stop_event.clear()
         self.skip_count = 0
