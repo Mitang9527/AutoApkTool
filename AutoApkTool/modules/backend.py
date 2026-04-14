@@ -8,7 +8,7 @@ import platform
 from datetime import datetime
 from typing import Optional, Set, List, Any, Dict
 from .constants import (
-    JSON_FILE,
+    PATH_INPUT_JSON_SRC,
     DEFAULT_CUSTOM_LIST,
     DEBOUNCE_SECONDS,
     SKIP_FEEDBACK_INTERVAL,
@@ -33,7 +33,7 @@ class SmartKeyBackend:
 
     def load_config(self) -> bool:
         """加载本地 input.json 配置"""
-        if not os.path.exists(JSON_FILE):
+        if not os.path.exists(PATH_INPUT_JSON_SRC):
             self.data = {
                 "stdkey": {},
                 "action": {},
@@ -45,7 +45,7 @@ class SmartKeyBackend:
             return True
 
         try:
-            with open(JSON_FILE, "r", encoding="utf-8") as f:
+            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
                 self.data = json.load(f)
 
             self.existing_actions = {
@@ -80,10 +80,12 @@ class SmartKeyBackend:
     def save_config(self, silent: bool = False) -> bool:
         """保存配置到 input.json"""
         try:
-            with open(JSON_FILE, "w", encoding="utf-8") as f:
+            with open(PATH_INPUT_JSON_SRC, "w", encoding="utf-8") as f:
                 json.dump(self.data, f, indent=2, ensure_ascii=False)
             if not silent:
-                self.log_callback(f"[OK] Configuration saved to {JSON_FILE}\n")
+                self.log_callback(
+                    f"[OK] Configuration saved to {PATH_INPUT_JSON_SRC}\n"
+                )
             return True
         except Exception as e:
             self.log_callback(f"[Error] save failed：{e}\n")

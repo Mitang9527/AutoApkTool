@@ -1,13 +1,37 @@
 import os
+import sys
 from pathlib import Path
 
 # ==================== 全局配置常量 ====================
 
+
+def get_base_path() -> Path:
+    """获取程序运行时的根路径，适配 PyInstaller"""
+    if getattr(sys, "frozen", False):
+        # 如果是打包后的 EXE 运行，返回临时解压目录
+        return Path(sys._MEIPASS)
+    # 如果是源码运行，返回当前文件所在目录的上级目录（即项目根目录）
+    return Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def get_cwd_path() -> Path:
+    """获取用户当前运行程序的目录，用于存放输出文件"""
+    if getattr(sys, "frozen", False):
+        # 如果是打包后的 EXE 运行，返回 EXE 所在目录
+        return Path(os.path.dirname(sys.executable))
+    # 如果是源码运行，返回当前工作目录
+    return Path(os.getcwd())
+
+
+# 资源路径（只读，打包时包含在 EXE 中）
+RESOURCE_PATH = get_base_path()
+# 工作路径（可读写，通常是 EXE 所在的目录）
+WORKSPACE_PATH = get_cwd_path()
+
 # 路径配置
-PROJECT_PATH = Path(os.getcwd())
 JSON_FILE = "input.json"
 TEMP_DIR = "app_out"
-APKTOOL_JAR = "apktool.jar"
+APKTOOL_JAR = RESOURCE_PATH / "apktool.jar"
 
 # 环境配置
 ENV_CONF = {
@@ -87,20 +111,21 @@ MAP_CONFIG_TEMPLATES = {
 }
 
 # 关键文件路径
-PATH_YML = PROJECT_PATH / "app_out" / "apktool.yml"
-PATH_ASS = PROJECT_PATH / "app_out" / "assets"
-PATH_SLCLIENT = PROJECT_PATH / "app_out" / "assets" / "slclient"
-PATH_SLCLIENT_JSON = PROJECT_PATH / "app_out" / "assets" / "slclient.json"
-PATH_INPUT_JSON_SRC = "input.json"
-PATH_INPUT_JSON_DST = PROJECT_PATH / "app_out" / "assets" / "slclient" / "input.json"
+TEMP_PATH = WORKSPACE_PATH / TEMP_DIR
+PATH_YML = TEMP_PATH / "apktool.yml"
+PATH_ASS = TEMP_PATH / "assets"
+PATH_SLCLIENT = PATH_ASS / "slclient"
+PATH_SLCLIENT_JSON = PATH_ASS / "slclient.json"
+PATH_INPUT_JSON_SRC = WORKSPACE_PATH / JSON_FILE
+PATH_INPUT_JSON_DST = PATH_SLCLIENT / JSON_FILE
 
 # 命名空间（确保与 manifest 中一致）
 ANDROID_NAMESPACE = "http://schemas.android.com/apk/res/android"
-PATH_MANIFEST_XML = PROJECT_PATH / "app_out" / "AndroidManifest.xml"
+PATH_MANIFEST_XML = TEMP_PATH / "AndroidManifest.xml"
 
 # 签名配置
-KEYSTORE_BIG = PROJECT_PATH / "cert" / "shanli.jks"
-KEYSTORE_SMALL = PROJECT_PATH / "cert" / "shanlitech.keystore"
+KEYSTORE_BIG = RESOURCE_PATH / "cert" / "shanli.jks"
+KEYSTORE_SMALL = RESOURCE_PATH / "cert" / "shanlitech.keystore"
 
 KEYSTORE_CONFIG = {
     "large": {"path": KEYSTORE_BIG, "password": "123456"},
@@ -110,8 +135,8 @@ KEYSTORE_CONFIG = {
 }
 
 # 工具链路径
-ZIPALIGN_EXE = PROJECT_PATH / "win" / "zipalign.exe"
-APKSIGNER_BAT = PROJECT_PATH / "win" / "apksigner.bat"
+ZIPALIGN_EXE = RESOURCE_PATH / "win" / "zipalign.exe"
+APKSIGNER_BAT = RESOURCE_PATH / "win" / "apksigner.bat"
 
 # 业务常量
 LAUNCHER_MODULE_PATH = ["ui", "launcherModule"]

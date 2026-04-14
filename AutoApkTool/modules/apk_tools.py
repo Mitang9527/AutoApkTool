@@ -8,7 +8,7 @@ import traceback
 import re
 from pathlib import Path
 from typing import List, Optional, Dict, Any
-from .constants import APKTOOL_JAR, PROJECT_PATH
+from .constants import APKTOOL_JAR
 from .utils import load_yml
 
 

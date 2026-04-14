@@ -483,8 +483,7 @@ class App(ctk.CTk):
 
         if hasattr(self, "opt_map_source"):
             map_source_display_names = [
-                v["display_name"][current_lang]
-                for v in MAP_CONFIG_TEMPLATES.values()
+                v["display_name"][current_lang] for v in MAP_CONFIG_TEMPLATES.values()
             ]
             self.opt_map_source.configure(values=map_source_display_names)
             current_map_source_key = "Google"
@@ -660,7 +659,7 @@ class App(ctk.CTk):
                         data = json.load(f)
                 except:
                     pass
-            
+
             headers = [
                 i18n.get("msg_header_key_name"),
                 i18n.get("msg_header_event"),
@@ -675,14 +674,14 @@ class App(ctk.CTk):
                     font=ctk.CTkFont(weight="bold", size=13),
                     anchor="w",
                 ).grid(row=0, column=i, padx=15, pady=15, sticky="w")
-            
+
             formatted_items = get_formatted_key_configs(data)
             row_idx = 1
-            
+
             for name, event_str, key_val, action_str, cmd_str in formatted_items:
                 if not self.winfo_exists():
                     return
-                
+
                 ctk.CTkLabel(
                     self.scroll_frame,
                     text=name,
@@ -831,14 +830,14 @@ class App(ctk.CTk):
                     self.entry_ptt_release.delete(0, "end")
                 if has_sos:
                     self.entry_sos.delete(0, "end")
-                
+
                 msg_lines = ["✅ Configuration is saved"]
                 if has_ptt:
                     msg_lines.append(f"   🟢 PTT Key: {result['ptt_key']}")
                 if has_sos:
                     msg_lines.append(f"   🔴 SOS Key: {result['sos_key']}")
                 final_msg = "\n".join(msg_lines)
-                
+
                 self.append_log(f"[Manual Save] {final_msg}\n")
                 self.show_custom_message("Successfully", final_msg)
                 self._safe_refresh_config_view()
@@ -1181,13 +1180,13 @@ class App(ctk.CTk):
                     KEYSTORE_CONFIG["large"],
                 )
                 date_str = time.strftime("%Y_%m_%d")
-                (PROJECT_PATH / date_str).mkdir(exist_ok=True)
+                (WORKSPACE_PATH / date_str).mkdir(exist_ok=True)
                 final_name = (
                     self.build_newname(PATH_YML)
                     if os.path.exists(PATH_YML)
                     else f"app_{self.apk_type_seg.get()}_{date_str}.apk"
                 )
-                output_apk_path = PROJECT_PATH / date_str / final_name
+                output_apk_path = WORKSPACE_PATH / date_str / final_name
                 if (
                     run_with_live_output(
                         self,
@@ -1207,7 +1206,7 @@ class App(ctk.CTk):
                 ):
                     raise Exception("APK signing failed")
                 safe_remove(self, "app-unsigned.apk")
-                shutil.rmtree("app_out", ignore_errors=True)
+                shutil.rmtree(TEMP_PATH, ignore_errors=True)
                 self.load_all_configs()
                 self.show_custom_message("SUCCESS", f"APK Safe: \n{output_apk_path}")
             except Exception as e:

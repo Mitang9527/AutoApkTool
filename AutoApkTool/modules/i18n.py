@@ -1,5 +1,6 @@
 import os
 import json
+from .constants import RESOURCE_PATH
 
 # ==================== 国际化多语言支持 ====================
 
@@ -8,7 +9,7 @@ class I18N:
     def __init__(self):
         self.current_lang = "en"  # 默认中文
         self.translations = {}
-        self.locales_dir = "locales"
+        self.locales_dir = RESOURCE_PATH / "locales"
         self.load_language("en")
 
     def load_language(self, lang_code):

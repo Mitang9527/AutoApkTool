@@ -21,7 +21,7 @@ from .constants import (
     PATH_MANIFEST_XML,
     PATH_ASS,
     PATH_SLCLIENT,
-    JSON_FILE,
+    PATH_INPUT_JSON_SRC,
 )
 from .i18n import i18n, _
 
@@ -317,7 +317,7 @@ def get_formatted_key_configs(data: dict) -> list:
         key_val = sk.get("key", i18n.get("msg_not_available"))
         action_str = info.get("action", i18n.get("msg_default_placeholder"))
         cmds = ac.get("default", [])
-        
+
         cmd_str = (
             ", ".join(
                 filter(
@@ -340,10 +340,12 @@ def get_formatted_key_configs(data: dict) -> list:
     return formatted_items
 
 
-def save_manual_keys_to_json(val_press: str, val_release: str, val_sos: str) -> Optional[Dict]:
+def save_manual_keys_to_json(
+    val_press: str, val_release: str, val_sos: str
+) -> Optional[Dict]:
     """
     将手动输入的 PTT 和 SOS 按键写入 backend 的 input.json/reaction.json 中
-    （实际写入到 JSON_FILE）
+    （实际写入到 PATH_INPUT_JSON_SRC）
     返回包含新分配 key 值的字典，如果失败或无内容则返回 None
     """
     has_ptt, has_sos = bool(val_press and val_release), bool(val_sos)
@@ -352,9 +354,9 @@ def save_manual_keys_to_json(val_press: str, val_release: str, val_sos: str) -> 
 
     timestamp_suffix = datetime.now().strftime("%Y%m%d%H%M%S")
     existing_codes = set()
-    if os.path.exists(JSON_FILE):
+    if os.path.exists(PATH_INPUT_JSON_SRC):
         try:
-            with open(JSON_FILE, "r", encoding="utf-8") as f:
+            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
                 temp_data = json.load(f)
                 for v in temp_data.get("stdkey", {}).values():
                     if isinstance(v.get("key"), int):
@@ -399,24 +401,28 @@ def save_manual_keys_to_json(val_press: str, val_release: str, val_sos: str) -> 
         (
             new_entries["intent"][name_ptt_down],
             new_entries["intent"][name_ptt_up],
-        ) = {"action": val_press}, {"action": val_release}
+        ) = {
+            "action": val_press
+        }, {"action": val_release}
 
     if has_sos:
         name_sos_down, name_sos_up = (
             f"sos_down_{timestamp_suffix}",
             f"sos_up_{timestamp_suffix}",
         )
-        new_entries["stdkey"][name_sos_down] = new_entries["stdkey"][
-            name_sos_up
-        ] = {"event": "KEY_CLICK", "key": new_vkey_sos, "time": 3000}
-        new_entries["intent"][name_sos_down] = new_entries["intent"][
-            name_sos_up
-        ] = {"action": val_sos}
+        new_entries["stdkey"][name_sos_down] = new_entries["stdkey"][name_sos_up] = {
+            "event": "KEY_CLICK",
+            "key": new_vkey_sos,
+            "time": 3000,
+        }
+        new_entries["intent"][name_sos_down] = new_entries["intent"][name_sos_up] = {
+            "action": val_sos
+        }
 
     data = {"stdkey": {}, "action": {}, "intent": {}, "custom": []}
-    if os.path.exists(JSON_FILE):
+    if os.path.exists(PATH_INPUT_JSON_SRC):
         try:
-            with open(JSON_FILE, "r", encoding="utf-8") as f:
+            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except Exception:
             pass
@@ -424,13 +430,37 @@ def save_manual_keys_to_json(val_press: str, val_release: str, val_sos: str) -> 
     for k in ["stdkey", "action", "intent"]:
         data.setdefault(k, {}).update(new_entries[k])
 
-    with open(JSON_FILE, "w", encoding="utf-8") as f:
+    with open(PATH_INPUT_JSON_SRC, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-    return {
-        "ptt_key": new_vkey_ptt,
-        "sos_key": new_vkey_sos
-    }
+    return {"ptt_key": new_vkey_ptt, "sos_key": new_vkey_sos}
+
+
+def get_current_custom_list() -> List[str]:
+    """获取当前 input.json 中的 custom 列表"""
+    if os.path.exists(PATH_INPUT_JSON_SRC):
+        try:
+            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get("custom", [])
+        except Exception:
+            pass
+    return []
+
+
+def update_custom_list(new_list: List[str]):
+    """更新 input.json 中的 custom 列表"""
+    data = {}
+    if os.path.exists(PATH_INPUT_JSON_SRC):
+        try:
+            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            pass
+
+    data["custom"] = new_list
+    with open(PATH_INPUT_JSON_SRC, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 # ==================== Manifest 辅助函数 ====================
