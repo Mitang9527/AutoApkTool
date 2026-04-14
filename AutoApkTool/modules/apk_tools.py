@@ -123,7 +123,7 @@ def safe_remove(app_instance, file_path: str, retries: int = 3) -> bool:
         try:
             if os.path.exists(file_path):
                 os.remove(file_path)
-                app_instance.append_log(f"[OK] Temporary file has been deleted")
+                app_instance.append_log(f"[OK] Temporary file has been deleted\n")
                 return True
         except PermissionError:
             app_instance.append_log(

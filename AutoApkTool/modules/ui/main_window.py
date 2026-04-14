@@ -1148,6 +1148,7 @@ class App(ctk.CTk):
                         set_json_field(
                             PATH_SLCLIENT_JSON, ["ui", "launcherModule"], "middle"
                         )
+                        self.append_log(f"[Success] Auto-config: ui.launcherModule alread set\n")
                     self.load_and_echo_config_after_unzip()
                     messagebox.showinfo("Success", "Decompile Apk Successful!")
                     self.after(500, self.load_all_configs)
@@ -1182,9 +1183,7 @@ class App(ctk.CTk):
                         json_src = PATH_INPUT_JSON_DEFAULT
 
                     if json_src.exists():
-                        # 始终执行同步
                         try:
-                            # 确保目标目录存在
                             PATH_INPUT_JSON_DST.parent.mkdir(
                                 parents=True, exist_ok=True
                             )
@@ -1259,6 +1258,7 @@ class App(ctk.CTk):
                 ):
                     raise Exception("APK signing failed")
                 safe_remove(self, "app-unsigned.apk")
+                safe_remove(self, "input.json")
                 shutil.rmtree(TEMP_PATH, ignore_errors=True)
                 self.load_all_configs()
                 self.show_custom_message("SUCCESS", f"APK Safe: \n{output_apk_path}")
