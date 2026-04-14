@@ -1,18 +1,25 @@
-# -*- mode: python ; coding: utf-8 -*-
+import os
+import sys
+
+# 获取当前 spec 文件所在的绝对路径
+spec_dir = os.path.dirname(os.path.abspath(SPEC))
 
 a = Analysis(
-    ['main.py'],
-    pathex=['.'],
+    [os.path.join(spec_dir, "main.py")],
+    pathex=[spec_dir],
     binaries=[],
     datas=[
-        ("locales", "locales"),
-        ("cert", "cert"),
-        ("win", "win"),
-        ("terminal_configs", "terminal_configs"),
-        ("Env", "Env"),
-        ("apktool.jar", "."),
+        (os.path.join(spec_dir, "locales"), "locales"),
+        (os.path.join(spec_dir, "cert"), "cert"),
+        (os.path.join(spec_dir, "win"), "win"),
+        (os.path.join(spec_dir, "terminal_configs"), "terminal_configs"),
+        (os.path.join(spec_dir, "Env"), "Env"),
+        (os.path.join(spec_dir, "apktool.jar"), "."),
+        (os.path.join(spec_dir, "LargeApp.apk"), "."),
+        (os.path.join(spec_dir, "SmallApp.apk"), "."),
+        (os.path.join(spec_dir, "Screenless.apk"), "."),
     ],
-    hiddenimports=[],
+    hiddenimports=["modules", "modules.ui", "modules.ui.main_window", "modules.ui.tabs", "modules.apk_tools", "modules.backend", "modules.constants", "modules.env_checker", "modules.i18n", "modules.utils"],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -47,5 +54,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='D:\\code\\AutoApk\\AutoApkTool\\png\\icons\\8m465-bddl0-001.ico',
+    icon=os.path.join(spec_dir, "png", "icons", "8m465-bddl0-001.ico"),
 )

@@ -1076,13 +1076,13 @@ class App(ctk.CTk):
                 apk_type = self.apk_type_seg.get()
                 self.current_apk_type = apk_type
                 if apk_type in ["大屏", "Large"]:
-                    apk_path = "LargeApp.apk"
+                    apk_path = APK_LARGE
                 elif apk_type in ["中屏", "Medium"]:
-                    apk_path = "LargeApp.apk"
+                    apk_path = APK_LARGE
                 elif apk_type in ["小屏", "Small"]:
-                    apk_path = "SmallApp.apk"
+                    apk_path = APK_SMALL
                 elif apk_type in ["无屏", "Screenless"]:
-                    apk_path = "Screenless.apk"
+                    apk_path = APK_SCREENLESS
                 elif apk_type in ["自定义", "Custom"]:
                     apk_path = filedialog.askopenfilename(
                         title="APK File", filetypes=[("APK File", "*.apk")]
