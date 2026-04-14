@@ -679,14 +679,19 @@ class App(ctk.CTk):
                 except:
                     pass
             data = {}
-            if self.backend and hasattr(self.backend, "data"):
+            if self.backend and hasattr(self.backend, "data") and self.backend.data:
                 data = self.backend.data
-            elif os.path.exists(JSON_FILE):
-                try:
-                    with open(JSON_FILE, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                except:
-                    pass
+            else:
+                load_path = PATH_INPUT_JSON_SRC
+                if not os.path.exists(load_path):
+                    load_path = PATH_INPUT_JSON_DEFAULT
+
+                if os.path.exists(load_path):
+                    try:
+                        with open(load_path, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                    except:
+                        pass
 
             headers = [
                 i18n.get("msg_header_key_name"),

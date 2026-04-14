@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Optional, Set, List, Any, Dict
 from .constants import (
     PATH_INPUT_JSON_SRC,
+    PATH_INPUT_JSON_DEFAULT,
     DEFAULT_CUSTOM_LIST,
     DEBOUNCE_SECONDS,
     SKIP_FEEDBACK_INTERVAL,
@@ -32,20 +33,24 @@ class SmartKeyBackend:
         self.existing_codes: Set[int] = set()
 
     def load_config(self) -> bool:
-        """加载本地 input.json 配置"""
-        if not os.path.exists(PATH_INPUT_JSON_SRC):
-            self.data = {
-                "stdkey": {},
-                "action": {},
-                "intent": {},
-                "custom": DEFAULT_CUSTOM_LIST.copy(),
-            }
-            self.existing_actions = set()
-            self.existing_codes = set()
-            return True
+        """加载本地 input.json 配置，如果工作目录没有，则尝试从内置资源加载"""
+        target_path = PATH_INPUT_JSON_SRC
+        if not os.path.exists(target_path):
+            if os.path.exists(PATH_INPUT_JSON_DEFAULT):
+                target_path = PATH_INPUT_JSON_DEFAULT
+            else:
+                self.data = {
+                    "stdkey": {},
+                    "action": {},
+                    "intent": {},
+                    "custom": DEFAULT_CUSTOM_LIST.copy(),
+                }
+                self.existing_actions = set()
+                self.existing_codes = set()
+                return True
 
         try:
-            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
+            with open(target_path, "r", encoding="utf-8") as f:
                 self.data = json.load(f)
 
             self.existing_actions = {

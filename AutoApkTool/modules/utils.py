@@ -22,6 +22,7 @@ from .constants import (
     PATH_ASS,
     PATH_SLCLIENT,
     PATH_INPUT_JSON_SRC,
+    PATH_INPUT_JSON_DEFAULT,
 )
 from .i18n import i18n, _
 
@@ -354,9 +355,13 @@ def save_manual_keys_to_json(
 
     timestamp_suffix = datetime.now().strftime("%Y%m%d%H%M%S")
     existing_codes = set()
-    if os.path.exists(PATH_INPUT_JSON_SRC):
+    source_path = PATH_INPUT_JSON_SRC
+    if not os.path.exists(source_path):
+        source_path = PATH_INPUT_JSON_DEFAULT
+
+    if os.path.exists(source_path):
         try:
-            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
+            with open(source_path, "r", encoding="utf-8") as f:
                 temp_data = json.load(f)
                 for v in temp_data.get("stdkey", {}).values():
                     if isinstance(v.get("key"), int):
@@ -420,9 +425,13 @@ def save_manual_keys_to_json(
         }
 
     data = {"stdkey": {}, "action": {}, "intent": {}, "custom": []}
-    if os.path.exists(PATH_INPUT_JSON_SRC):
+    load_path = PATH_INPUT_JSON_SRC
+    if not os.path.exists(load_path):
+        load_path = PATH_INPUT_JSON_DEFAULT
+
+    if os.path.exists(load_path):
         try:
-            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
+            with open(load_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except Exception:
             pass
@@ -438,9 +447,13 @@ def save_manual_keys_to_json(
 
 def get_current_custom_list() -> List[str]:
     """获取当前 input.json 中的 custom 列表"""
-    if os.path.exists(PATH_INPUT_JSON_SRC):
+    load_path = PATH_INPUT_JSON_SRC
+    if not os.path.exists(load_path):
+        load_path = PATH_INPUT_JSON_DEFAULT
+
+    if os.path.exists(load_path):
         try:
-            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
+            with open(load_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             return data.get("custom", [])
         except Exception:
@@ -451,9 +464,13 @@ def get_current_custom_list() -> List[str]:
 def update_custom_list(new_list: List[str]):
     """更新 input.json 中的 custom 列表"""
     data = {}
-    if os.path.exists(PATH_INPUT_JSON_SRC):
+    load_path = PATH_INPUT_JSON_SRC
+    if not os.path.exists(load_path):
+        load_path = PATH_INPUT_JSON_DEFAULT
+
+    if os.path.exists(load_path):
         try:
-            with open(PATH_INPUT_JSON_SRC, "r", encoding="utf-8") as f:
+            with open(load_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except Exception:
             pass

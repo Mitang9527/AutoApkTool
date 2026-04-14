@@ -18,6 +18,7 @@ a = Analysis(
         (os.path.join(spec_dir, "LargeApp.apk"), "."),
         (os.path.join(spec_dir, "SmallApp.apk"), "."),
         (os.path.join(spec_dir, "Screenless.apk"), "."),
+        (os.path.join(spec_dir, "input.json"), "."),
     ],
     hiddenimports=["modules", "modules.ui", "modules.ui.main_window", "modules.ui.tabs", "modules.apk_tools", "modules.backend", "modules.constants", "modules.env_checker", "modules.i18n", "modules.utils"],
     hookspath=[],
