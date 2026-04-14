@@ -1,8 +1,18 @@
 import os
 import customtkinter as ctk
 from pathlib import Path
-from ..i18n import _
-from ..constants import *
+from ..constants import (
+    RESOURCE_PATH,
+    WORKSPACE_PATH,
+    PATH_SLCLIENT_JSON,
+    PATH_YML,
+    APKSIGNER_BAT,
+)
+from ..i18n import i18n, _
+from ..utils import (
+    get_formatted_key_configs,
+    copy_terminal_configs_from_folder,
+)
 
 
 def create_log_tab(app, parent):
@@ -99,9 +109,11 @@ def create_terminal_tab(app, parent):
         frame_apk_config, width=800, height=500
     )
     app.terminal_scroll_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
+    terminal_configs_path = RESOURCE_PATH / "terminal_configs"
     app.terminal_all_folders = (
-        [f for f in Path("terminal_configs").iterdir() if f.is_dir()]
-        if Path("terminal_configs").exists()
+        [f for f in terminal_configs_path.iterdir() if f.is_dir()]
+        if terminal_configs_path.exists()
         else []
     )
     app.current_displayed_folders = app.terminal_all_folders.copy()

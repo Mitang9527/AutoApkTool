@@ -8,6 +8,8 @@ a = Analysis(
         ("locales", "locales"),
         ("cert", "cert"),
         ("win", "win"),
+        ("terminal_configs", "terminal_configs"),
+        ("Env", "Env"),
         ("apktool.jar", "."),
     ],
     hiddenimports=[],
