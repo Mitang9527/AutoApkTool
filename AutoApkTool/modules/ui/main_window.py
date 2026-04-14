@@ -1182,26 +1182,18 @@ class App(ctk.CTk):
                         json_src = PATH_INPUT_JSON_DEFAULT
 
                     if json_src.exists():
-                        # 读取配置以确定目标路径
+                        # 始终执行同步
                         try:
-                            with open(json_src, "r", encoding="utf-8") as f:
-                                input_data = json.load(f)
-                            config = input_data.get("config", {})
-                            should_save = config.get("save_to_apk", True)
-                            target_rel_path = config.get(
-                                "target_path", "assets/slclient/input.json"
+                            # 确保目标目录存在
+                            PATH_INPUT_JSON_DST.parent.mkdir(
+                                parents=True, exist_ok=True
                             )
-
-                            if should_save:
-                                # 计算绝对目标路径
-                                target_dst = TEMP_PATH / target_rel_path
-                                # 确保目标目录存在
-                                target_dst.parent.mkdir(parents=True, exist_ok=True)
-                                shutil.copy2(json_src, target_dst)
-                        except Exception as e:
-                            self.append_log(f"[Warn] 处理 input.json 同步失败: {e}\n")
-                            # 回退到默认同步逻辑
                             shutil.copy2(json_src, PATH_INPUT_JSON_DST)
+                            self.append_log(
+                                f"[Info] 同步配置文件: {json_src.name} -> {PATH_INPUT_JSON_DST}\n"
+                            )
+                        except Exception as e:
+                            self.append_log(f"[Error] 同步 input.json 失败: {e}\n")
 
                 if (
                     run_with_live_output(
