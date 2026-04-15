@@ -8,6 +8,8 @@ __pycache__/
 *.spec
 build/
 dist/
+*.exe
+*.pkg
 
 # IDE
 .vscode/
@@ -20,3 +22,6 @@ app_out/
 !LargeApp.apk
 !SmallApp.apk
 !Screenless.apk
+
+# Specific cleanup
+AutoApkTool/202*_*/
