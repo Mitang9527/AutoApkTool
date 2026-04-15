@@ -19,9 +19,9 @@ dist/
 app_out/
 202*_*/
 *.apk
-!LargeApp.apk
-!SmallApp.apk
-!Screenless.apk
+!AutoApkTool/APK/LargeApp.apk
+!AutoApkTool/APK/SmallApp.apk
+!AutoApkTool/APK/Screenless.apk
 
 # Specific cleanup
 AutoApkTool/202*_*/

@@ -34,9 +34,9 @@ TEMP_DIR = "app_out"
 APKTOOL_JAR = RESOURCE_PATH / "apktool.jar"
 
 # 内置 APK 路径
-APK_LARGE = RESOURCE_PATH / "LargeApp.apk"
-APK_SMALL = RESOURCE_PATH / "SmallApp.apk"
-APK_SCREENLESS = RESOURCE_PATH / "Screenless.apk"
+APK_LARGE = RESOURCE_PATH / "APK" / "LargeApp.apk"
+APK_SMALL = RESOURCE_PATH / "APK" / "SmallApp.apk"
+APK_SCREENLESS = RESOURCE_PATH / "APK" / "Screenless.apk"
 
 # 环境配置
 ENV_CONF = {
