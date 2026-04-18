@@ -146,6 +146,7 @@ def create_config_card(app, parent, title, row, col, content_func):
 
 
 def build_env_content(app, parent):
+
     current_lang = app.lang_var.get()
     base_options = [
         ENV_DISPLAY_NAMES.get(k, {}).get("zh" if current_lang == "中文" else "en", k)

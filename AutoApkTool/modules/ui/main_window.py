@@ -59,7 +59,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title(_("app_title"))
-        self.geometry("1200x700")
+        self.geometry("1200x780")
 
         # 添加标志跟踪是否是环境预设值
         self.is_default_dns = False
@@ -615,7 +615,7 @@ class App(ctk.CTk):
             "ADB 错误",
             "未连接",
         ]:
-            messagebox.showerror("ERR", "请先选择有效的 ADB 设备！")
+            messagebox.showerror(_("error_title"), _("msg_err_adb"))
             self.refresh_devices()
             return
 
@@ -819,7 +819,7 @@ class App(ctk.CTk):
 
     def _use_terminal_config(self, folder_path):
         if not PATH_SLCLIENT_JSON.exists():
-            messagebox.showerror("ERROR", f"Please unzip apk first")
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
             return False
         self.copy_terminal_files(folder_path)
         self.load_all_configs()
@@ -831,9 +831,8 @@ class App(ctk.CTk):
         try:
             copy_terminal_configs_from_folder(source_dir)
             self.append_log(f"[Success] Imported {folder_path.name} successfully\n")
-            self.show_custom_message(
-                "Success", f"Imported \n\n{folder_path.name}\n\nsuccessfully!"
-            )
+            messagebox.showinfo(_("success_title"),_("success_import"))
+
         except Exception as e:
             self.append_log(f"[Error]: {e}\n")
 
@@ -845,18 +844,7 @@ class App(ctk.CTk):
         )
         has_ptt, has_sos = bool(val_press and val_release), bool(val_sos)
         if not has_ptt and not has_sos:
-            self.lbl_env_info.configure(
-                text="❌ 错误：请至少填写 PTT (按下 + 抬起) 或 SOS 其中一项！",
-                text_color="#c0392b",
-                font=ctk.CTkFont(size=12, weight="bold"),
-            )
-            return
-        if (val_press and not val_release) or (not val_press and val_release):
-            self.lbl_env_info.configure(
-                text="❌ 错误：请输入 PTT 的按下和抬起 Action！",
-                text_color="#c0392b",
-                font=ctk.CTkFont(size=12, weight="bold"),
-            )
+            messagebox.showerror(_("error_title"),_("lbl_env_info"))
             return
         try:
             result = save_manual_keys_to_json(val_press, val_release, val_sos)
@@ -867,7 +855,7 @@ class App(ctk.CTk):
                 if has_sos:
                     self.entry_sos.delete(0, "end")
 
-                msg_lines = ["✅ Configuration is saved"]
+                msg_lines = [" "]
                 if has_ptt:
                     msg_lines.append(f"   🟢 PTT Key: {result['ptt_key']}")
                 if has_sos:
@@ -875,15 +863,16 @@ class App(ctk.CTk):
                 final_msg = "\n".join(msg_lines)
 
                 self.append_log(f"[Manual Save] {final_msg}\n")
-                self.show_custom_message("Successfully", final_msg)
+                messagebox.showinfo(_("success_safe_title"), final_msg)
                 self._safe_refresh_config_view()
         except Exception as e:
+            error_msg = f"❌ ERROR：{str(e)}"
             self.append_log(f"[Error] _on_save_manual_keys: {e}\n")
-            messagebox.showerror("ERROR", f"❌ ERROR：{str(e)}")
+            messagebox.showerror(_("error_title"), error_msg)
 
     def _save_profile_changes(self):
         if not PATH_SLCLIENT_JSON.exists():
-            messagebox.showerror("ERROR", f"Please unzip apk first")
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
             return False
         new_ip, new_context, upgrade_url = (
             self.entry_custom_ip.get().strip(),
@@ -891,7 +880,7 @@ class App(ctk.CTk):
             self.entry_custom_upgrade.get().strip(),
         )
         if not new_ip or not new_context:
-            messagebox.showwarning("Error", "IP and Context must be entered！")
+            messagebox.showwarning(_("error_title"), _("msg_err_safe"))
             return
         try:
             update_slclient_profile(
@@ -899,7 +888,7 @@ class App(ctk.CTk):
                 context=new_context,
                 upgrade_url=upgrade_url if upgrade_url else None,
             )
-            self.show_custom_message("Successfully", "saved successfully")
+            messagebox.showinfo(_("success_title"), _("success_safe_title"))
         except Exception as e:
             messagebox.showerror("Error", f"❌ 保存失败: {str(e)}")
 
@@ -953,7 +942,7 @@ class App(ctk.CTk):
 
     def on_map_source_change(self, selected_display_name: str) -> None:
         if not PATH_SLCLIENT_JSON.exists():
-            messagebox.showerror("ERROR", f"Please unzip apk first")
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
             return
         selected_key = next(
             (
@@ -1152,7 +1141,7 @@ class App(ctk.CTk):
                         )
                         self.append_log(f"[Success] Auto-config: ui.launcherModule alread set\n")
                     self.load_and_echo_config_after_unzip()
-                    messagebox.showinfo("Success", "Decompile Apk Successful!")
+                    messagebox.showinfo(_("success_title"), _("success_unzip"))
                     self.after(500, self.load_all_configs)
             except Exception as e:
                 self.append_log(f"\n[ERROR]: {str(e)}\n")
@@ -1163,7 +1152,7 @@ class App(ctk.CTk):
 
     def build_apk(self) -> None:
         if not PATH_SLCLIENT_JSON.exists():
-            messagebox.showerror("ERROR", f"Please unzip apk first")
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
             return False
         self.build_apk_btn.configure(state="disabled")
 
@@ -1173,7 +1162,7 @@ class App(ctk.CTk):
                     return False
                 model = self.ask_model_dialog()
                 if model is None:
-                    raise Exception("User cancels packaging")
+                    raise Exception(_("msg_err_canel"))
                 self.current_device_model = model
                 if model:
                     set_json_field(PATH_SLCLIENT_JSON, ["device", "name"], model)
@@ -1263,9 +1252,10 @@ class App(ctk.CTk):
                 safe_remove(self, "input.json")
                 shutil.rmtree(TEMP_PATH, ignore_errors=True)
                 self.load_all_configs()
-                self.show_custom_message("SUCCESS", f"APK Safe: \n{output_apk_path}")
+                messagebox.showinfo(_("success_title"),_("success_build"))
             except Exception as e:
-                messagebox.showerror("ERROR", f"[FAIL] ❌ {str(e)}")
+                error_msg = f"[FAIL] ❌ {str(e)}"
+                messagebox.showerror(_("error_title"), error_msg)
             finally:
                 self.build_apk_btn.configure(state="normal", text=_("btn_build"))
                 self.is_import = False

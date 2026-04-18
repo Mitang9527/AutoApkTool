@@ -1,5 +1,5 @@
 {
-    "app_title": "App Adaptation_1.0.1",
+    "app_title": "App Adaptation_2.4",
     "sidebar_logo": "App\nAdaptation",
     "lbl_device": "Device Selection",
     "btn_refresh": "Refresh Devices",
@@ -74,5 +74,16 @@
     "confirm_config_text": "📦 Confirm Configuration",
     "package_config_title": "Package Configuration Confirmation",
     "confirm_button": "✅ Confirm Package",
-    "cancel_button": "❌ Cancel"
+    "cancel_button": "❌ Cancel",
+    "error_title": "Error",
+    "msg_unzip_first": "Please unzip apk first",
+    "msg_err_safe": "IP and Context must be entered！",
+    "msg_err_adb": "Please select a valid ADB device first!",
+    "msg_err_canel": "User cancels packaging",
+    "success_title": "Success",
+    "success_unzip": "Decompile Apk Successful!",
+    "success_import": "Imported Successful!",
+    "success_build": "APK Build Successful!",
+    "success_safe_title": "Safe Successful!",
+    "lbl_env_info": "Please fill in at least one of the following: PTT (Press + Release) or SOS!"
 }

@@ -34,7 +34,7 @@ def update_slclient_login_type(login_type_ui: str) -> bool:
     更新slclient.json中的profile.login_mode字段
     """
     if not PATH_SLCLIENT_JSON.exists():
-        messagebox.showerror("ERROR", f"Please unzip apk first")
+        messagebox.showerror(_("error_title"), _("msg_unzip_first"))
         return False
 
     login_mode_val = "account"  # 默认值
@@ -58,7 +58,7 @@ def update_slclient_login_type(login_type_ui: str) -> bool:
         return True
 
     except Exception as e:
-        messagebox.showerror("修改失败", f"更新slclient.json出错：\n{str(e)}")
+        messagebox.showerror(_("error_title"), f"更新slclient.json出错：\n{str(e)}")
         traceback.print_exc()
         return False
 
