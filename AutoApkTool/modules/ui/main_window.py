@@ -517,13 +517,13 @@ class App(ctk.CTk):
                 v["display_name"][current_lang] for v in MAP_CONFIG_TEMPLATES.values()
             ]
             self.opt_map_source.configure(values=map_source_display_names)
-            current_map_source_key = "Google"
+            current_map_source_key = "google"
             if PATH_SLCLIENT_JSON.exists():
                 try:
                     with open(PATH_SLCLIENT_JSON, "r", encoding="utf-8") as f:
                         slclient_data = json.load(f)
                     current_map_source_key = slclient_data.get("lbs", {}).get(
-                        "map_type", "Google"
+                        "map_type", "google"
                     )
                     map_coor = get_json_field(PATH_SLCLIENT_JSON, LBS_COOR_PATH)
                     if map_coor == "wgs84" and current_map_source_key == "baidu":
@@ -1265,11 +1265,14 @@ class App(ctk.CTk):
     def build_newname(self, yml_path: Path) -> str:
         try:
             version_str = get_version_info(yml_path)[1]
+            base_part = version_str.rsplit('_', 1)[0]
+            time_suffix = time.strftime('%Y%m%d%H%M%S')
+            new_version_str = f"{base_part}_{time_suffix}"
             device_model = str(getattr(self, "current_device_model", ""))
             new_version_name = (
-                re.sub(r"(POCSTARS_)", r"\g<1>" + device_model + "_", version_str)
+                re.sub(r"(POCSTARS_)", r"\g<1>" + device_model + "_", new_version_str)
                 if device_model
-                else version_str
+                else new_version_str
             )
             launcher_module = get_json_field(PATH_SLCLIENT_JSON, LAUNCHER_MODULE_PATH)
             prefix = (

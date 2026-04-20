@@ -65,6 +65,18 @@ LOGIN_TYPE_MAPPING = {
 }
 
 MAP_CONFIG_TEMPLATES = {
+    "google": {
+        "display_name": {"zh": "谷歌", "en": "Google"},
+        "config": {
+            "enabled": True,
+            "report": True,
+            "map_type": "google",
+            "provider": "google",
+            "coor": "wgs84",
+            "update_period_sec": 40,
+            "report_period_sec": 40,
+        },
+    },
     "baidu_domestic": {
         "display_name": {"zh": "百度 [国内]", "en": "Baidu [Domestic]"},
         "config": {
@@ -84,18 +96,6 @@ MAP_CONFIG_TEMPLATES = {
             "report": True,
             "map_type": "baidu",
             "provider": "baidu",
-            "coor": "wgs84",
-            "update_period_sec": 40,
-            "report_period_sec": 40,
-        },
-    },
-    "google": {
-        "display_name": {"zh": "谷歌", "en": "Google"},
-        "config": {
-            "enabled": True,
-            "report": True,
-            "map_type": "google",
-            "provider": "google",
             "coor": "wgs84",
             "update_period_sec": 40,
             "report_period_sec": 40,
