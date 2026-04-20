@@ -874,11 +874,11 @@ class App(ctk.CTk):
         if not PATH_SLCLIENT_JSON.exists():
             messagebox.showerror(_("error_title"), _("msg_unzip_first"))
             return False
-        new_ip, new_context, upgrade_url = (
-            self.entry_custom_ip.get().strip(),
-            self.entry_custom_context.get().strip(),
-            self.entry_custom_upgrade.get().strip(),
-        )
+        new_ip = self.entry_custom_ip.get().strip() if self.entry_custom_ip.cget("text_color") == "black" else ""
+        new_context = self.entry_custom_context.get().strip() if self.entry_custom_context.cget(
+            "text_color") == "black" else ""
+        upgrade_url = self.entry_custom_upgrade.get().strip() if self.entry_custom_upgrade.cget(
+            "text_color") == "black" else ""
         if not new_ip or not new_context:
             messagebox.showwarning(_("error_title"), _("msg_err_safe"))
             return
