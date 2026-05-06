@@ -66,7 +66,7 @@ LOGIN_TYPE_MAPPING = {
 
 MAP_CONFIG_TEMPLATES = {
     "google": {
-        "display_name": {"zh": "谷歌", "en": "Google"},
+        "display_name": {"zh": "GPS[谷歌地图]", "en": "GPS[Google Map]"},
         "config": {
             "enabled": True,
             "report": True,
@@ -123,6 +123,7 @@ PATH_SLCLIENT = PATH_ASS / "slclient"
 PATH_SLCLIENT_JSON = PATH_ASS / "slclient.json"
 PATH_INPUT_JSON_SRC = WORKSPACE_PATH / JSON_FILE
 PATH_INPUT_JSON_DEFAULT = RESOURCE_PATH / JSON_FILE
+PATH_INPUT_DEFAULT_JSON = RESOURCE_PATH / "terminal_configs" / "input_default.json"
 PATH_INPUT_JSON_DST = PATH_SLCLIENT / JSON_FILE
 
 # 命名空间（确保与 manifest 中一致）

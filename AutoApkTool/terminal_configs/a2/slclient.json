@@ -118,14 +118,14 @@
     "engine": ""
   },
   "lbs": {
-            "enabled": true,
-            "report": true,
-            "map_type": "baidu",
-            "provider": "baidu",
-            "coor": "bd09ll",
-            "update_period_sec": 40,
-            "report_period_sec": 40
-        },
+    "enabled": true,
+    "report": true,
+    "map_type": "google",
+    "provider": "google",
+    "coor": "wgs84",
+    "update_period_sec": 40,
+    "report_period_sec": 40
+  },
   "sos": {
     "enabled": true,
     "snd_priority": 1000,

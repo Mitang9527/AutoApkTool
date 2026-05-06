@@ -165,16 +165,24 @@ def build_env_content(app, parent):
     )
     app.entry_custom_ip = ctk.CTkEntry(parent)
     app.entry_custom_ip.grid(row=4, column=1, padx=5, pady=(5, 2), sticky="ew")
+    app.entry_custom_ip.bind("<FocusIn>", lambda e: app._on_entry_focus_in(e, "entry_custom_ip"))
+    app.entry_custom_ip.bind("<FocusOut>", lambda e: app._on_entry_focus_out(e, "entry_custom_ip"))
+
     ctk.CTkLabel(parent, text="Context:", anchor="w").grid(
         row=5, column=0, padx=5, pady=(2, 10), sticky="w"
     )
     app.entry_custom_context = ctk.CTkEntry(parent)
     app.entry_custom_context.grid(row=5, column=1, padx=5, pady=(2, 10), sticky="ew")
+    app.entry_custom_context.bind("<FocusIn>", lambda e: app._on_entry_focus_in(e, "entry_custom_context"))
+    app.entry_custom_context.bind("<FocusOut>", lambda e: app._on_entry_focus_out(e, "entry_custom_context"))
+
     ctk.CTkLabel(parent, text="upgrade url:", anchor="w").grid(
         row=6, column=0, padx=5, pady=(2, 10), sticky="w"
     )
     app.entry_custom_upgrade = ctk.CTkEntry(parent)
     app.entry_custom_upgrade.grid(row=6, column=1, padx=5, pady=(2, 10), sticky="ew")
+    app.entry_custom_upgrade.bind("<FocusIn>", lambda e: app._on_entry_focus_in(e, "entry_custom_upgrade"))
+    app.entry_custom_upgrade.bind("<FocusOut>", lambda e: app._on_entry_focus_out(e, "entry_custom_upgrade"))
     app.lbl_login_type = ctk.CTkLabel(parent, text=_("lbl_login_type"), anchor="w")
     app.lbl_login_type.grid(row=2, column=0, padx=5, pady=10, sticky="w")
     login_type_display_names = [
@@ -270,7 +278,7 @@ def build_other_content(app, parent):
     )
     app.switch_launcher = ctk.CTkSwitch(
         parent,
-        text="",
+        text=" ",
         command=lambda: app.modify_manifest(bool(app.switch_launcher.get())),
     )
     app.switch_launcher.grid(row=2, column=1, padx=5, pady=8, sticky="w")
@@ -334,7 +342,7 @@ def render_terminal_folders(app, folders):
         )
         ctk.CTkLabel(
             icon_frame,
-            text=folder.name[:10] + ("..." if len(folder.name) > 10 else ""),
+            text=folder.name[:20] + ("..." if len(folder.name) > 10 else ""),
             font=ctk.CTkFont(size=12),
             wraplength=100,
         ).pack(pady=(0, 5))

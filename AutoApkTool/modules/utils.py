@@ -497,9 +497,28 @@ def write_pretty_xml(tree, file_path):
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(pretty_xml)
 
+def get_package_from_manifest(manifest_path):
+    """
+    从 AndroidManifest.xml 中提取 package 属性
+    """
+    try:
+        # 解析 XML 文件
+        tree = ET.parse(manifest_path)
+        root = tree.getroot()
+
+        package_name = root.get('package')
+        return package_name
+
+    except Exception as e:
+        print(f"解析 Manifest 失败: {e}")
+        return None
 
 def modify_manifest(is_enabled: bool, log_callback=None):
     manifest_path = PATH_MANIFEST_XML
+
+    if not PATH_SLCLIENT_JSON.exists():
+        messagebox.showerror(_("error_title"), _("msg_unzip_first"))
+        return False
 
     if not os.path.exists(manifest_path):
         if log_callback:

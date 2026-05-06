@@ -44,7 +44,7 @@ from ..constants import (
     PATH_SLCLIENT,
     PATH_INPUT_JSON_SRC,
     PATH_INPUT_JSON_DST,
-    TEMP_DIR,
+    TEMP_DIR, PATH_INPUT_DEFAULT_JSON,
 )
 from ..i18n import i18n, _
 from ..env_checker import EnvChecker, is_adb_installed
@@ -59,7 +59,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title(_("app_title"))
-        self.geometry("1200x780")
+        self.geometry("1200x750")
 
         # 添加标志跟踪是否是环境预设值
         self.is_default_dns = False
@@ -579,7 +579,7 @@ class App(ctk.CTk):
                 if "\tdevice" in line and not line.startswith("List")
             ]
             current_val = self.device_var.get()
-            self.device_menu.configure(values=devs if devs else ["no devices"])
+            self.device_menu.configure(values=devs if devs else [" "])
             if devs:
                 if current_val not in devs or current_val in [
                     "未连接",
@@ -592,7 +592,7 @@ class App(ctk.CTk):
                 else:
                     self.current_device = current_val
             else:
-                self.device_var.set("no devices")
+                self.device_var.set(" ")
                 self.current_device = ""
         except:
             if self.winfo_exists():
@@ -655,8 +655,10 @@ class App(ctk.CTk):
                 try:
                     text = self.log_queue.get_nowait()
                     if hasattr(self, "log_textbox") and self.log_textbox.winfo_exists():
+                        self.log_textbox.configure(state="normal")
                         self.log_textbox.insert("end", text)
                         self.log_textbox.see("end")
+                        self.log_textbox.configure(state="disabled")
                 except queue.Empty:
                     break
         except:
@@ -665,7 +667,9 @@ class App(ctk.CTk):
 
     def clear_log(self) -> None:
         if hasattr(self, "log_textbox") and self.log_textbox.winfo_exists():
+            self.log_textbox.configure(state="normal")
             self.log_textbox.delete("0.0", "end")
+            self.log_textbox.configure(state="disabled")
 
     def refresh_config_view(self) -> None:
         if not self.winfo_exists():
@@ -874,11 +878,9 @@ class App(ctk.CTk):
         if not PATH_SLCLIENT_JSON.exists():
             messagebox.showerror(_("error_title"), _("msg_unzip_first"))
             return False
-        new_ip = self.entry_custom_ip.get().strip() if self.entry_custom_ip.cget("text_color") == "black" else ""
-        new_context = self.entry_custom_context.get().strip() if self.entry_custom_context.cget(
-            "text_color") == "black" else ""
-        upgrade_url = self.entry_custom_upgrade.get().strip() if self.entry_custom_upgrade.cget(
-            "text_color") == "black" else ""
+        new_ip = self.entry_custom_ip.get().strip()
+        new_context = self.entry_custom_context.get().strip()
+        upgrade_url = self.entry_custom_upgrade.get().strip()
         if not new_ip or not new_context:
             messagebox.showwarning(_("error_title"), _("msg_err_safe"))
             return
@@ -889,12 +891,15 @@ class App(ctk.CTk):
                 upgrade_url=upgrade_url if upgrade_url else None,
             )
             messagebox.showinfo(_("success_title"), _("success_safe_title"))
+            self.load_and_echo_config_after_unzip()
+            self.focus()
         except Exception as e:
             messagebox.showerror("Error", f"❌ 保存失败: {str(e)}")
 
     def _sync_codec_to_json(self, selected_codec: str) -> None:
         if not PATH_SLCLIENT_JSON.exists():
-            return
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
+            return False
         try:
             if slclient_set_sound_codec(selected_codec):
                 self.append_log(f"[OK] Voice coding switched: {selected_codec}\n")
@@ -903,7 +908,8 @@ class App(ctk.CTk):
 
     def _sync_soundsystem_to_json(self, selected_codec: str) -> None:
         if not PATH_SLCLIENT_JSON.exists():
-            return
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
+            return False
         try:
             if slclient_set_dsp_provider(selected_codec):
                 self.append_log(f"[OK] Audio system switched: {selected_codec}\n")
@@ -912,7 +918,8 @@ class App(ctk.CTk):
 
     def _sync_play_to_json(self, selected_codec: str) -> None:
         if not PATH_SLCLIENT_JSON.exists():
-            return
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
+            return False
         try:
             if slclient_set_play_stream(selected_codec):
                 self.append_log(f"[OK] Playback channel switched: {selected_codec}\n")
@@ -921,7 +928,8 @@ class App(ctk.CTk):
 
     def _sync_record_to_json(self, selected_codec: str) -> None:
         if not PATH_SLCLIENT_JSON.exists():
-            return
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
+            return False
         try:
             if slclient_set_record_stream(selected_codec):
                 self.append_log(f"[OK] Recording channels switched: {selected_codec}\n")
@@ -930,7 +938,8 @@ class App(ctk.CTk):
 
     def _sync_tone_enabled_to_json(self, is_enabled: bool) -> None:
         if not PATH_SLCLIENT_JSON.exists():
-            return
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
+            return False
         try:
             json_value = bool(is_enabled)
             if slclient_set_tone_enabled(json_value):
@@ -966,7 +975,8 @@ class App(ctk.CTk):
 
     def _sync_tts_enabled_to_json(self, is_enabled: bool) -> None:
         if not PATH_SLCLIENT_JSON.exists():
-            return
+            messagebox.showerror(_("error_title"), _("msg_unzip_first"))
+            return False
         try:
             json_value = bool(is_enabled)
             if slclient_set_tts_enabled(json_value):
@@ -1002,6 +1012,23 @@ class App(ctk.CTk):
                 )
             except Exception:
                 pass
+        self.load_and_echo_config_after_unzip()
+
+    def _on_entry_focus_in(self, event, entry_name):
+        entry = getattr(self, entry_name)
+        if entry.cget("text_color") == "gray":
+            # 记录当前灰色的回显值，以便失焦时判断
+            self._temp_echo_val = entry.get()
+            entry.delete(0, "end")
+            entry.configure(text_color=["black", "white"])
+
+    def _on_entry_focus_out(self, event, entry_name):
+        entry = getattr(self, entry_name)
+        if not entry.get().strip():
+            # 如果没有输入内容，还原回显值并设为灰色
+            if hasattr(self, "_temp_echo_val"):
+                entry.insert(0, self._temp_echo_val)
+                entry.configure(text_color="gray")
 
     def _update_preview(self, key, value):
         self.build_config[key] = value
@@ -1135,11 +1162,23 @@ class App(ctk.CTk):
                     )
                     == 0
                 ):
-                    if apk_type in ["中屏", "Medium"]:
-                        set_json_field(
-                            PATH_SLCLIENT_JSON, ["ui", "launcherModule"], "middle"
-                        )
-                        self.append_log(f"[Success] Auto-config: ui.launcherModule alread set\n")
+                    # if apk_type in ["中屏", "Medium"]:
+                    #     set_json_field(
+                    #         PATH_SLCLIENT_JSON, ["ui", "launcherModule"], "middle"
+                    #     )
+                    #     self.append_log(f"[Success] Auto-config: ui.launcherModule alread set\n")
+
+                    package_names = [
+                        "com.shli.interphone",
+                        "com.shanlitech.noscreen",
+                        "com.shanlitech.ptt"
+                    ]
+                    # 只解压poc的apk
+                    if not get_package_from_manifest(PATH_MANIFEST_XML) in package_names:
+                        messagebox.showerror(_("error_title"), _("error_poc"))
+                        shutil.rmtree(output_dir, ignore_errors=True)
+                        self.append_log("[ERROR]:The file has been deleted\n")
+                        return False
                     self.load_and_echo_config_after_unzip()
                     messagebox.showinfo(_("success_title"), _("success_unzip"))
                     self.after(500, self.load_all_configs)
@@ -1184,6 +1223,23 @@ class App(ctk.CTk):
                             )
                         except Exception as e:
                             self.append_log(f"[Error] Failed to sync input.json: {e}\n")
+
+                # 兼容无屏问题
+                new_screen = "none"  # 设置默认值
+
+                if self.current_apk_type in ["无屏", "Screenless"]:
+                    new_screen = "none"
+                elif self.current_apk_type in ["大屏", "Large"]:
+                    new_screen = "large"
+                elif self.current_apk_type in ["中屏", "Medium"]:
+                    new_screen = "middle"
+                elif self.current_apk_type in ["小屏", "Small"]:
+                    new_screen = "small"
+                elif self.current_apk_type in ["自定义","Custom"]:
+                    new_screen = get_json_field(PATH_SLCLIENT_JSON, LAUNCHER_MODULE_PATH)
+
+                set_json_field(PATH_SLCLIENT_JSON, LAUNCHER_MODULE_PATH, new_screen)
+                self.append_log(f"APK type: {self.current_apk_type} -> Setting Screen to: {new_screen}")
 
                 if (
                     run_with_live_output(
@@ -1258,7 +1314,10 @@ class App(ctk.CTk):
                 messagebox.showerror(_("error_title"), error_msg)
             finally:
                 self.build_apk_btn.configure(state="normal", text=_("btn_build"))
+                # 还原导入标示，后续打包继续使用覆盖input.json
                 self.is_import = False
+                shutil.copy2(PATH_INPUT_DEFAULT_JSON,PATH_INPUT_JSON_SRC)
+
 
         threading.Thread(target=task, daemon=True).start()
 
