@@ -29,6 +29,11 @@ from .i18n import i18n, _
 # ==================== slclient.json处理 ====================
 
 
+def now_time_day() -> str:
+    """获取当前日期字符串，格式为 YYYY_MM_DD"""
+    return datetime.now().strftime("%Y_%m_%d")
+
+
 def update_slclient_login_type(login_type_ui: str) -> bool:
     """
     更新slclient.json中的profile.login_mode字段

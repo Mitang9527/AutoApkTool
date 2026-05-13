@@ -33,10 +33,10 @@ JSON_FILE = "input.json"
 TEMP_DIR = "app_out"
 APKTOOL_JAR = RESOURCE_PATH / "apktool.jar"
 
-# 内置 APK 路径
-APK_LARGE = RESOURCE_PATH / "APK" / "LargeApp.apk"
-APK_SMALL = RESOURCE_PATH / "APK" / "SmallApp.apk"
-APK_SCREENLESS = RESOURCE_PATH / "APK" / "Screenless.apk"
+# 内置 DEF_APK 路径
+APK_LARGE = RESOURCE_PATH / "DEF_APK" / "LargeApp.apk"
+APK_SMALL = RESOURCE_PATH / "DEF_APK" / "SmallApp.apk"
+APK_SCREENLESS = RESOURCE_PATH / "DEF_APK" / "Screenless.apk"
 
 # 环境配置
 ENV_CONF = {

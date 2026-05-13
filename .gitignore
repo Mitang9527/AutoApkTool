@@ -17,11 +17,11 @@ dist/
 
 # Output
 app_out/
-202*_*/
+20**_*/
 *.apk
-!AutoApkTool/APK/LargeApp.apk
-!AutoApkTool/APK/SmallApp.apk
-!AutoApkTool/APK/Screenless.apk
+!AutoApkTool/DEF_APK/LargeApp.apk
+!AutoApkTool/DEF_APK/SmallApp.apk
+!AutoApkTool/DEF_APK/Screenless.apk
 
 # Specific cleanup
 AutoApkTool/202*_*/

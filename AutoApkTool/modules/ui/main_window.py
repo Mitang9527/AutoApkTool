@@ -51,6 +51,7 @@ from ..env_checker import EnvChecker, is_adb_installed
 from ..backend import SmartKeyBackend
 from ..utils import *
 from ..apk_tools import *
+from ..zip_recent_files import zip_and_delete_subfolders
 
 
 class App(ctk.CTk):
@@ -1278,14 +1279,21 @@ class App(ctk.CTk):
                     json_val if json_val in KEYSTORE_CONFIG else "large",
                     KEYSTORE_CONFIG["large"],
                 )
-                date_str = time.strftime("%Y_%m_%d")
-                (WORKSPACE_PATH / date_str).mkdir(exist_ok=True)
+
+                apk_dir = WORKSPACE_PATH / "APK"
+                apk_dir.mkdir(exist_ok=True)
+
+                date_str = now_time_day()
+                output_dir = apk_dir / date_str
+                output_dir.mkdir(exist_ok=True)
+
                 final_name = (
                     self.build_newname(PATH_YML)
                     if os.path.exists(PATH_YML)
                     else f"app_{self.apk_type_seg.get()}_{date_str}.apk"
                 )
-                output_apk_path = WORKSPACE_PATH / date_str / final_name
+                output_apk_path = output_dir / final_name
+
                 if (
                     run_with_live_output(
                         self,
@@ -1308,6 +1316,7 @@ class App(ctk.CTk):
                 safe_remove(self, "input.json")
                 shutil.rmtree(TEMP_PATH, ignore_errors=True)
                 self.load_all_configs()
+                zip_and_delete_subfolders(apk_dir, log_callback=self.append_log)
                 messagebox.showinfo(_("success_title"),_("success_build"))
             except Exception as e:
                 error_msg = f"[FAIL] ❌ {str(e)}"

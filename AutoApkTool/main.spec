@@ -15,9 +15,9 @@ a = Analysis(
         (os.path.join(spec_dir, "terminal_configs"), "terminal_configs"),
         (os.path.join(spec_dir, "Env"), "Env"),
         (os.path.join(spec_dir, "apktool.jar"), "."),
-        (os.path.join(spec_dir, "APK", "LargeApp.apk"), "APK"),
-        (os.path.join(spec_dir, "APK", "SmallApp.apk"), "APK"),
-        (os.path.join(spec_dir, "APK", "Screenless.apk"), "APK"),
+        (os.path.join(spec_dir, "DEF_APK", "LargeApp.apk"), "DEF_APK"),
+        (os.path.join(spec_dir, "DEF_APK", "SmallApp.apk"), "DEF_APK"),
+        (os.path.join(spec_dir, "DEF_APK", "Screenless.apk"), "DEF_APK"),
         (os.path.join(spec_dir, "input.json"), "."),
     ],
     hiddenimports=[
